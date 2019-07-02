@@ -1,1 +1,1 @@
-# foundations-template
+#Foundations new project template structure
