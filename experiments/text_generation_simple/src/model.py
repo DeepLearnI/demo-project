@@ -1,12 +1,9 @@
 """
 Each function here can be considered as a step (stage) towards building a model.
 
-Although we don't use foundations in this simple example, we import Foundations as it quickly becomes useful once want to use features like `.log_metric()` within stage functions.
-
 We create a simple function that adds 10 to a number that will be used as a stage in our driver file.
 """
 
-import foundations
 import tensorflow as tf
 import os
 import time
@@ -34,13 +31,6 @@ class Model:
         self.model = self.build_model()
         self.model.summary()
 
-        def loss(labels, logits):
-            return tf.keras.losses.sparse_categorical_crossentropy(labels, logits, from_logits=True)
-        
-        self.model.compile(
-            optimizer=tf.train.AdamOptimizer(),
-            loss=loss)
-
     def build_model(self):
         model = tf.keras.Sequential([
             tf.keras.layers.Embedding(self.vocab_size, self.embedding_dim,
@@ -53,7 +43,7 @@ class Model:
         ])
         return model
     
-    def train(self, dataset, steps_per_epoch, checkpoint_dir='./training_checkpoints', epochs=30, job_id=-1):
+    def train(self, dataset, steps_per_epoch, checkpoint_dir='./training_checkpoints', epochs=30):
         # Directory where the checkpoints will be saved
         checkpoint_dir = checkpoint_dir
         # Name of the checkpoint files
@@ -62,9 +52,8 @@ class Model:
         # Define the optimizer to use
         optimizer = tf.train.AdamOptimizer()
         
-        post_slack_channel('Training job starting',
-                           job_id=job_id)
-        
+        post_slack_channel('Training job starting')
+
         for epoch in range(epochs):
             start = time.time()
     
@@ -83,12 +72,10 @@ class Model:
                 grads = tape.gradient(loss, self.model.trainable_variables)
                 optimizer.apply_gradients(zip(grads, self.model.trainable_variables))
         
-                if batch_n % steps_per_epoch == 0:
-                    template = '[Epoch {} - Loss {:.4f}]'
-                    print(template.format(epoch + 1, loss))
-                    post_slack_channel(template.format(epoch + 1, loss),
-                                       job_id=job_id)
-    
+            template = '[Epoch {} - Loss {:.4f}]'
+            print(template.format(epoch + 1, loss))
+            post_slack_channel(template.format(epoch + 1, loss))
+
             # saving (checkpoint) the model every 5 epochs
             if (epoch + 1) % 5 == 0:
                 self.model.save_weights(checkpoint_prefix.format(epoch=epoch))
@@ -96,8 +83,7 @@ class Model:
             print('Epoch {} Loss {:.4f}'.format(epoch + 1, loss))
             print('Time taken for 1 epoch {} sec\n'.format(time.time() - start))
 
-            post_slack_channel('End of training: Epoch {} - Loss {}'.format(epoch + 1, loss),
-                               job_id=job_id)
+        post_slack_channel('End of training: Epoch {} - Loss {}'.format(epoch + 1, loss))
 
         self.model.save_weights(checkpoint_prefix.format(epoch=epoch))
 
