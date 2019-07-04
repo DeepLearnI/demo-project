@@ -31,7 +31,7 @@ def preprocess_data(path_to_file, params):
     # The maximum length sentence we want for a single input in characters
     seq_length = params['seq_length']
     
-    text_as_int_train, text_as_int_test = train_test_split(text_as_int, test_size=0.2, random_state=101)
+    text_as_int_train, text_as_int_test = text_as_int[:int(len(text_as_int) * 0.8)], text_as_int[int(-0.2 * len(text_as_int)):]
     
     examples_per_epoch_train = len(text_as_int_train) // seq_length
     examples_per_epoch_test = len(text_as_int_test) // seq_length

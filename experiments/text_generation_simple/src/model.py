@@ -20,10 +20,13 @@ class Model:
         self.batch_size = batch_size
         self.char2idx = char2idx
         self.idx2char = idx2char
+        self.loss = tf.losses.sparse_softmax_cross_entropy
 
         if tf.test.is_gpu_available():
-            self.rnn = tf.keras.layers.CuDNNGRU
+            print('Using GPU')
+            self.rnn = tf.keras.layers.GRU
         else:
+            print('using CPU')
             import functools
             self.rnn = functools.partial(
                 tf.keras.layers.GRU, recurrent_activation='sigmoid')
@@ -66,7 +69,7 @@ class Model:
                     # feeding the hidden state back into the model
                     # This is the interesting step
                     predictions = self.model(inp)
-                    loss = tf.losses.sparse_softmax_cross_entropy(target, predictions)
+                    loss = self.loss(target, predictions)
         
                 # Back prop
                 grads = tape.gradient(loss, self.model.trainable_variables)
@@ -88,7 +91,15 @@ class Model:
         self.model.save_weights(checkpoint_prefix.format(epoch=epoch))
 
     def test(self, dataset, steps):
-        return self.model.evaluate(dataset.repeat(), steps=steps)
+        loss = 0
+        for n_batch, (inp, target) in enumerate(dataset):
+            pred = self.model(inp)
+            
+            loss += self.loss(target, pred)
+            
+        loss /= (n_batch + 1)
+    
+        return loss
 
     def generate_text(self, start_string, checkpoint_dir='./training_checkpoints', temperature=1.):
         self.batch_size = 1

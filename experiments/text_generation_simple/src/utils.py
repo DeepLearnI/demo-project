@@ -10,7 +10,7 @@ def get_params():
         "rnn_units": np.random.randint(256, 2049),
         "batch_size": np.random.randint(16, 256),
         "embedding_dim": np.random.randint(128, 512),
-        "epochs": 1,
+        "epochs": 30,
         "seq_length": 100,
         "temperature": 1.,
         "dataset_url": "https://storage.googleapis.com/download.tensorflow.org/data/shakespeare.txt"
