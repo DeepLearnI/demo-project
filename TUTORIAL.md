@@ -1,28 +1,56 @@
-# Tutorial (TODO title)
+![Dessa Logo](https://dessa.com/wp-content/uploads/2018/05/dessa_logo.svg)
 
-Intro TODO
+# Welcome to Foundations
 
-## 1 Run a simple job
+*Estimated time: 20 minutes*
 
-We're going to start off with some code we've provided. It's a basic recurrent language model that will train on some text, and learn to generate similar text based on a prompt. 
+Welcome to the Foundations trial environment! This trial environment provides you with a fully managed Foundations setup including:
 
-Note that this code is nothing special right now; just some basic Python libraries and TensorFlow. We don't really have to modify it at all in the beginning to just run it with Foundations. 
+* ??? GPUs
+* Foundations, TensorFlow, and Python scientific stack pre-installed 
+* An in-browser IDE
 
-### 1.0 Go to the online IDE
+Keep in mind Foundations is infrastructure-agnostic and can be set up on premise or on cloud depending on your needs.
 
-[http://35.231.61.216:8443/](http://35.231.61.216:8443/)
+In this trial we will start by taking a basic recurrent language model and using it to explore some of Foundations' most important features.
 
-### 1.1 Click to run
+This is what we'll achieve today:
 
-In the 'Debug' menu, click 'Start Without Debugging' [TODO can this be better]
+1. Without any Foundations-specific code at all, we will submit our code to be executed on a remote machine with a GPU
 
-This is set up to run the entry point, `driver.py`. It can be customized (e.g. your entry point does not *need* to be named "driver"), and it's really just running a simple Foundations command, which looks something like
+1. We will then add our first lines of Foundations code to store metrics of our choosing
+
+1. We will try to optimise our model using Foundations' hyperparameter search feature. We will see how Foundations can execute multiple jobs using all available computation resources, and can track all parameters and results in an experiment log, allowing for full reproducibility.
+
+1. While doing this we will see how you can use Foundations to manage large scale experimentation.
+
+1. Finally, we'll select the best model and show how easy it is to serve it. 
+
+
+
+## 1 Hello, world!
+
+To the right of this pane, you will see `driver.py`. This is a piece of code that was quickly written by one of our machine learning engineers _without using Foundations_. 
+
+The model is a language generator [TODO Mohammed doesn't like this]. We train it on some Shakespearean text so that we're able to synthesize new text that sounds like Shakespeare. 
+ 
+Note that this code is nothing special right now; just some basic Python libraries and TensorFlow. We don't really have to modify it at all in the beginning to just run it on a cluster of GPU machines using Foundations. 
+
+
+### 1.1 Submit job
+
+Using this one command, we're going to take the code and run it on a remote server with a GPU, all with this one command!
+
+Underneath you'll see a terminal. Go ahead and copy this command into the terminal, setting your own `project_name` if you like:
 
 ```
-$ foundations deploy --project_name=my_project src/driver.py
+$ foundations deploy --env scheduler --project_name=my_project src/driver.py
 ```
 
-And that's it! You can also easily deploy Foundations jobs from within Python code using the Foundations library
+### 1.2 Look at GUI
+
+In a new tab, open [https://35.231.61.216:6443/](https://35.231.61.216:6443/). Note that we haven't tracked any metrics or submitted jobs with lots of different parameters yet, but later we'll be able to easily track them here. 
+
 
 ### 1.2 See latest logs
 
@@ -34,28 +62,28 @@ Now in the terminal type
 
 ```
 $ foundations retrieve logs --job_id=<copied_job_id>
-
 ```
 
-### Look at GUI
-
-In a new tab, open [https://35.231.61.216:6443/](https://35.231.61.216:6443/). Note that we haven't tracked any metrics or submitted jobs with lots of different parameters yet, but later we'll be able to easily track them here. 
+[ TODO more]
 
 ### Receive Slack message
 
+[TODO}]
 In `utils.py`, [TODO how does a demo user get their own Slack ID]
 
 You can use `post_slack_channel()` to freely post 
 
 ## Experiment queueing management
 
-Tracking experiments is powerful if you do a large. We can track all the hyperparameters we try, and all metrics you can calculate in code about any particular experiment.
+Tracking experiments is powerful if you do [TODO]. We can track all the hyperparameters we try, and all metrics you can calculate in code about any particular experiment.
+
+[TODO]
 
 ### Log a metric 
 
 In `driver.py` we have a couple of lines that collect useful information about our model. In this case, we have `loss`, but in other modeling projects you might want to use metrics like accuracy, or AUCROC, or custom business metrics. 
 
-For now, let's track the train loss and test loss metrics we've already calculated. 
+For now, let's track the train loss and test loss metrics we already have code to calculate.
 
 Start by adding an import statement at the top of `driver.py`:
 
@@ -66,7 +94,7 @@ import foundations
 Look for the following lines
 
 
-```
+```python
 train_loss = model.test(dataset_train, steps_per_epoch_train)
 print(train_loss)
 
@@ -77,9 +105,9 @@ generated_text = model.generate_text(start_string=u"ROMEO: ", checkpoint_dir='./
 print(generated_text)
  ```
     
- All you need to do to track a metric using foundations is to call `log_metric` on any number you want foundations to save
+ All you need to do to track a metric using foundations is to call `log_metric` on any number or string you want foundations to save
  
- ```angular2
+ ```python
 foundations.log_metric("train loss", train_loss)
 foundations.log_metric("test loss", test_loss)
 foundations.log_metric("sample output", generated_text[:100])
@@ -93,8 +121,56 @@ Presently hyperparams already exist, let's store them
 
 ### Run a job and look at the GUI again
 
+Refresh the GUI
 
-### Run a hyperparameter search [TODO might not work yet] [Distributed workload!]
+
+
+### Run a hyperparameter search [Distributed workload!]
+
+In `utils.py` right now, we have a `params` dictionary. This is just a configuration of hyperparameters for convenience so far. What we want is for Foundations to track our hyperparameters for us! [TODO more on the benefits]
+
+Start by creating a new file [TODO how] in the `experiment_management/`, and copy the following code in:
+
+```python
+import foundations
+import numpy as np
+
+def get_params():
+    params = {
+        "rnn_units": np.random.randint(256, 2049),
+        "batch_size": np.random.randint(16, 256),
+        "embedding_dim": np.random.randint(128, 512),
+        "epochs": 30,
+        "seq_length": 100,
+        "temperature": 1.,
+        "dataset_url": "https://storage.googleapis.com/download.tensorflow.org/data/shakespeare.txt"
+    }
+    
+for _ in range(5):
+    foundations.set_job_resources(num_gpus=0)
+    foundations.deploy(
+        env="sched",
+        job_directory="experiments/text_generation_simple",
+        entrypoint="src/driver.py",
+        params=gen_params(),
+    )
+```
+
+Now in `driver.py`, delete line ???[TODO]
+
+```python
+from utils import params
+```
+
+And add the following line after `import foundations`:
+
+```python
+params = foundations.get_params()
+```
+
+Now everytime you submit a job, foundations will generate a set of hyperparameters for you, and all hyperparameters will be tracked in the GUI.
+
+Let's try it out! 
 
 
 
@@ -119,5 +195,3 @@ ALL OF THIS IS STILL TODO
 
 ### serve
 
-
-1. Look at our very simple implimentation of a text completion model implemented in TensorFlow `text_generation_simple` from github 
