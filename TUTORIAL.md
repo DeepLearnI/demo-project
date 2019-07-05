@@ -124,7 +124,6 @@ Presently hyperparams already exist, let's store them
 Refresh the GUI
 
 
-
 ### Run a hyperparameter search [Distributed workload!]
 
 In `utils.py` right now, we have a `params` dictionary. This is just a configuration of hyperparameters for convenience so far. What we want is for Foundations to track our hyperparameters for us! [TODO more on the benefits]
