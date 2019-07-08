@@ -41,15 +41,24 @@ Note that this code is nothing special right now; just some basic Python librari
 
 Using this one command, we're going to take the code and run it on a remote server with a GPU, all with this one command!
 
-Underneath you'll see a terminal. Go ahead and copy this command into the terminal, setting your own `project_name` if you like:
+Underneath you'll see a terminal. Go ahead and copy this command into the terminal, setting your own `project-name` if you like:
 
 ```
-$ foundations deploy --env scheduler --project_name=my_project src/driver.py
+$ foundations deploy --env scheduler --project-name testme --job-directory experiments/text_generation_simple/src --entrypoint driver.py --num-gpus 0
 ```
+
+Let's break down this command briefly: 
+
+* `foundations deploy` submits a job
+* `--env` looks for a configuration file by that name. In a long-term project you might have need to submit jobs to different environments, or want a configuration file for local submissions. [TODO clarify & expand]
+* `--project-name` is a user-specified project title. You can freely create new ones whenever you need
+* [TODO]
 
 ### 1.2 Look at GUI
 
-In a new tab, open [https://35.231.61.216:6443/](https://35.231.61.216:6443/). Note that we haven't tracked any metrics or submitted jobs with lots of different parameters yet, but later we'll be able to easily track them here. 
+In a new tab, open [https://35.231.226.217:6443/projects](https://35.231.226.217:6443/projects). Click the Project you're submitting jobs to.
+
+Note that we haven't tracked any metrics or submitted jobs with lots of different parameters yet, but later we'll be able to easily track them here. 
 
 
 ### 1.2 See latest logs
@@ -61,17 +70,15 @@ Copy the job_id from the job you just submitted.
 Now in the terminal type
 
 ```
-$ foundations retrieve logs --job_id=<copied_job_id>
+$ foundations retrieve logs --env scheduler --job_id=<copied_job_id>
 ```
 
-[ TODO more]
+You can do this at any time while your jobs is running to print their latest terminal output. This is also useful for investigating failed jobs. 
+
 
 ### Receive Slack message
 
-[TODO}]
-In `utils.py`, [TODO how does a demo user get their own Slack ID]
-
-You can use `post_slack_channel()` to freely post 
+[TODO}]  -- either remove or reformulate depending on whether Slack feature exists
 
 ## Experiment queueing management
 
@@ -81,7 +88,7 @@ Tracking experiments is powerful if you do [TODO]. We can track all the hyperpar
 
 ### Log a metric 
 
-In `driver.py` we have a couple of lines that collect useful information about our model. In this case, we have `loss`, but in other modeling projects you might want to use metrics like accuracy, or AUCROC, or custom business metrics. 
+In `driver.py` we have a couple of lines that collect useful information about our model.  
 
 For now, let's track the train loss and test loss metrics we already have code to calculate.
 
