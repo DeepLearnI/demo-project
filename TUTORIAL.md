@@ -120,20 +120,11 @@ foundations.log_metric("test loss", test_loss)
 foundations.log_metric("sample output", generated_text[:100])
 ```
 
-### Add parameters
-
-[TODO, use Foundations hyperparams]
-Presently hyperparams already exist, let's store them
-[TODO, foundations generate_random_parameters IS COMING SOON]
-
-### Run a job and look at the GUI again
-
-Refresh the GUI
 
 
-### Run a hyperparameter search [Distributed workload!]
+### Explore parameter and architecture space 
 
-In `utils.py` right now, we have a `params` dictionary. This is just a configuration of hyperparameters for convenience so far. What we want is for Foundations to track our hyperparameters for us! [TODO more on the benefits]
+In `utils.py` right now, we have a `params` dictionary. This is just a configuration of parameters for convenience so far. What we want is for Foundations to track our parameters for us! 
 
 Start by creating a new file [TODO how] in the `experiment_management/`, and copy the following code in:
 
