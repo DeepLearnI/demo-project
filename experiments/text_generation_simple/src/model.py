@@ -99,7 +99,7 @@ class Model:
             
         loss /= (n_batch + 1)
     
-        return loss
+        return float(loss)
 
     def generate_text(self, start_string, checkpoint_dir='./training_checkpoints', temperature=1.):
         self.batch_size = 1
