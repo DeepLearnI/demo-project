@@ -24,7 +24,7 @@ class Model:
 
         if tf.test.is_gpu_available():
             print('Using GPU')
-            self.rnn = tf.keras.layers.GRU
+            self.rnn = tf.keras.layers.CuDNNGRU
         else:
             print('using CPU')
             import functools

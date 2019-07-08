@@ -16,13 +16,16 @@ from utils import post_slack_channel
 try:
     from preprocessing import download_data, preprocess_data
     from model import Model
-    from utils import get_params
+    from utils import get_params, save_preprocessors, load_preprocessors
 
     path_to_file = download_data('https://storage.googleapis.com/download.tensorflow.org/data/shakespeare.txt', 'shakespeare.txt')
 
     params = get_params()
 
     dataset_train, dataset_test, steps_per_epoch_train, steps_per_epoch_test, vocab, char2idx, idx2char = preprocess_data(path_to_file, params)
+
+    # Save preprocessors for serving
+    save_preprocessors(char2idx, idx2char)
 
     model = Model(vocab,
                   embedding_dim=params['embedding_dim'],
@@ -51,3 +54,17 @@ except Exception as e:
     trace = traceback.format_exc()
     post_slack_channel('Job failed. Catching Exception:\n{}'.format(trace))
     raise e
+
+
+def predict(input_text):
+    char2idx, idx2char = load_preprocessors()
+
+    model = Model(vocab,
+                  embedding_dim=params['embedding_dim'],
+                  rnn_units=params['rnn_units'],
+                  batch_size=params['batch_size'],
+                  char2idx=char2idx,
+                  idx2char=idx2char)
+
+    generated_text = model.generate_text(start_string=u"ROMEO: ", checkpoint_dir='./training_checkpoints', temperature=params['temperature'])
+    return generated_text
