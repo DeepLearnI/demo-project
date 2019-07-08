@@ -144,11 +144,12 @@ def get_params():
         "temperature": 1.,
         "dataset_url": "https://storage.googleapis.com/download.tensorflow.org/data/shakespeare.txt"
     }
+    return params
     
 for _ in range(5):
     foundations.set_job_resources(num_gpus=0)
     foundations.deploy(
-        env="sched",
+        env="scheduler",
         job_directory="experiments/text_generation_simple",
         entrypoint="src/driver.py",
         params=gen_params(),
