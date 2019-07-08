@@ -1,6 +1,6 @@
 import numpy as np
 from slackclient import SlackClient
-import pickle as pkl
+import pickle
 
 slack_client = SlackClient('xoxp-6264324945-46768961556-314329155110-1f92449856f0d07a99f7598ff31e9bf2')
 
