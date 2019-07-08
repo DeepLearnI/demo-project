@@ -163,7 +163,7 @@ from utils import params
 And add the following line after `import foundations`:
 
 ```python
-params = foundations.get_params()
+params = foundations.load_parameters()
 ```
 
 Now everytime you submit a job, foundations will generate a set of hyperparameters for you, and all hyperparameters will be tracked in the GUI.
