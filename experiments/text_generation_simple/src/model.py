@@ -92,6 +92,7 @@ class Model:
 
     def test(self, dataset, steps):
         loss = 0
+        n_batch = 0
         for n_batch, (inp, target) in enumerate(dataset):
             pred = self.model(inp)
             
