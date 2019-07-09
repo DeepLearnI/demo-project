@@ -12,7 +12,6 @@ We define the experiment to run as `result` and then use Foundations's `.run()` 
 Then you can run the driver file with `python main.py` to send the experiment off to be run. To check results, see the `/results` directory where you'll read and interact with results.
 """
 from utils import post_slack_channel
-import foundations
 import time
 
 try:
@@ -21,8 +20,6 @@ try:
     from utils import get_params, save_preprocessors, load_preprocessors
 
     path_to_file = download_data('https://storage.googleapis.com/download.tensorflow.org/data/shakespeare.txt', 'shakespeare.txt')
-
-    params = foundations.load_parameters()
 
     dataset_train, dataset_test, steps_per_epoch_train, steps_per_epoch_test, vocab, char2idx, idx2char = preprocess_data(path_to_file, params)
 
