@@ -30,7 +30,7 @@ This is what we'll achieve today:
 
 ## 1 Hello, world!
 
-To the right of this pane, you will see `driver.py`. This is a piece of code that was quickly written by one of our machine learning engineers _without using Foundations_. 
+To the right of this pane, you will see `main.py`. This is a piece of code that was quickly written by one of our machine learning engineers _without using Foundations_. 
 
 The model is a language generator [TODO Mohammed doesn't like this]. We train it on some Shakespearean text so that we're able to synthesize new text that sounds like Shakespeare. 
  
@@ -76,7 +76,7 @@ to `main.py` but can be specified manually
 
 ### 1.2 Look at GUI
 
-In a new tab, open [https://35.231.226.217:6443/projects](https://35.231.226.217:6443/projects). Click the Project you're submitting jobs to.
+In a new tab, open [https://<IP>:<PORT>/projects](https://<IP>:<PORT>/projects). Click the Project you're submitting jobs to.
 
 Note that we haven't tracked any metrics or submitted jobs with lots of 
 different parameters yet, but later in this tutorial we'll easily track them here. 
@@ -112,12 +112,12 @@ we try, and all metrics you can calculate in code about any particular experimen
 
 ### Log a metric 
 
-In `driver.py` we already have a couple of lines that print 
+In `main.py` we already have a couple of lines that print 
 useful information about our model. It's easy to get Foundations to log them. 
 
 For now, let's track the train loss and test loss metrics we already have. [TODO rewrite]
 
-Start by adding an import statement to `driver.py`:
+Start by adding an import statement to `main.py`:
 
 ```
 import foundations
@@ -158,7 +158,7 @@ as soon as they're recorded, so you can do things like have a Keras callback sav
 a metric within the training loop. 
 
 
-Let's go back to the jobs page: [https://35.231.226.217:6443/projects](https://35.231.226.217:6443/projects)
+Let's go back to the jobs page: [https://<IP>:<PORT>/projects](https://<IP>:<PORT>/projects)
 
 You should be able to see the metrics you've saved in the right pane.
 
@@ -172,7 +172,7 @@ Start by creating a new file called `deploy_jobs.py` (or use any name) in the `e
 ```python
 import foundations
 
-for _ in range(2):
+for _ in range(3):
     foundations.deploy(
         env="scheduler",
         job_directory="experiments/text_generation_simple",
@@ -188,11 +188,11 @@ cd ../..
 python experiment_management/deploy_jobs.py
 ```
 
-Because of the loop we used, this will submit 2 jobs. 
+Because of the loop we used, this will submit 3 jobs. 
 
 ### Explore parameter and architecture space 
 
-In `utils.py` right now, we have a `params` dictionary. This is just a 
+At the top of `main.py`, we have a `params` dictionary. This is just a 
 configuration 
 of parameters for convenience so far. 
 
@@ -212,7 +212,7 @@ def get_params():
         "embedding_dim": np.random.randint(128, 512),
         "epochs": 30,
         "seq_length": 100,
-        "temperature": 1.,
+        "temperature": 0.1,
         "dataset_url": "https://storage.googleapis.com/download.tensorflow.org/data/shakespeare.txt"
     }
     return params
@@ -220,29 +220,37 @@ def get_params():
 
 Then to `foundations.deploy(...)`, add the parameter `params=get_params()`
 
-Now in `driver.py`, delete line ???
 
-```python
-from utils import params
-```
-
-And add the following line somewhere after `import foundations`:
+Now in `main.py` add the following line somewhere after `import foundations`:
 
 ```python
 params = foundations.load_parameters()
 ```
 
-Now everytime you submit a job, foundations will generate a new set of 
-hyperparameters for you, and all hyperparameters will be tracked in the GUI.
+Now every time you submit a job, foundations will generate a new set of 
+parameters for you which it will show in the GUI and track.
 
 Let's try it out! 
 
+```bash
+python experiment_management/deploy_jobs.py
+```
 
+This will submit 3 jobs with 3 different sets of parameters.
+
+You can change the number in the loop we created in `deploy_jobs.py` and 
+do a larger search (try somewhere between 10 and 20 for now since the trial 
+environment includes 10 machines with GPUs). 
 
 
 ## Serving
 
+Foundations provides a standard format for packaging your 
+machine learning code so that can be productionized seamlessly.
+
 ### Pick a best performing model
+
+
 
 ### Make code "serveable"
 
