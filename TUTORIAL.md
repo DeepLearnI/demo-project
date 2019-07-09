@@ -41,24 +41,45 @@ Note that this code is nothing special right now; just some basic Python librari
 
 Using this one command, we're going to take the code and run it on a remote server with a GPU, all with this one command!
 
-Underneath you'll see a terminal. Go ahead and copy this command into the terminal, setting your own `project-name` if you like:
+Underneath you'll see a terminal. 
 
+Start by `cd`ing into the project directory:
+
+```bash
+$ cd experiments/text_generation_simple
 ```
-$ foundations deploy --env scheduler --project-name testme --job-directory experiments/text_generation_simple/src --entrypoint driver.py --num-gpus 0
+
+Go ahead and copy this command into the terminal, adding your 
+own `--project-name` if you like:
+
+```bash
+$ foundations deploy --env scheduler 
 ```
+
+Submitting a job like this will stream the output live; 
+you can stop it at any time using Ctrl+C, the job will continue running.
 
 Let's break down this command briefly: 
 
 * `foundations deploy` submits a job
-* `--env` looks for a configuration file by that name. In a long-term project you might have need to submit jobs to different environments, or want a configuration file for local submissions. [TODO clarify & expand]
-* `--project-name` is a user-specified project title. You can freely create new ones whenever you need
+* `--env` looks for a configuration file by that name. In a long-term 
+project you might have need to submit jobs to different environments, 
+or want a configuration file for local submissions. [TODO clarify & expand]
+
+We are making use of defaults for a few others:
+
+* `--project-name` is a user-specified project title. It defaults to the 
+directory name. You can freely create new ones whenever you need
+* `--entrypoint` is the name of the script to run, it defaults 
+to `main.py` but can be specified manually
 * [TODO]
 
 ### 1.2 Look at GUI
 
 In a new tab, open [https://35.231.226.217:6443/projects](https://35.231.226.217:6443/projects). Click the Project you're submitting jobs to.
 
-Note that we haven't tracked any metrics or submitted jobs with lots of different parameters yet, but later we'll be able to easily track them here. 
+Note that we haven't tracked any metrics or submitted jobs with lots of 
+different parameters yet, but later in this tutorial we'll easily track them here. 
 
 
 ### 1.2 See latest logs
@@ -70,29 +91,33 @@ Copy the job_id from the job you just submitted.
 Now in the terminal type
 
 ```
-$ foundations retrieve logs --env scheduler --job_id=<copied_job_id>
+$ foundations retrieve logs --env scheduler --job_id <copied_job_id>
 ```
 
-You can do this at any time while your jobs is running to print their latest terminal output. This is also useful for investigating failed jobs. 
+You can do this at any time while your jobs are running to print their 
+latest terminal output. This is also useful for investigating failed jobs. 
 
 
 ### Receive Slack message
 
-[TODO}]  -- either remove or reformulate depending on whether Slack feature exists
+[TODO] 
 
 ## Experiment queueing management
 
-Tracking experiments is powerful if you do [TODO]. We can track all the hyperparameters we try, and all metrics you can calculate in code about any particular experiment.
+Tracking experiments is powerful if you do [TODO]. We can track all the 
+parameters and architectures 
+we try, and all metrics you can calculate in code about any particular experiment.
 
 [TODO]
 
 ### Log a metric 
 
-In `driver.py` we have a couple of lines that collect useful information about our model.  
+In `driver.py` we already have a couple of lines that print 
+useful information about our model. It's easy to get Foundations to log them. 
 
-For now, let's track the train loss and test loss metrics we already have code to calculate.
+For now, let's track the train loss and test loss metrics we already have. [TODO rewrite]
 
-Start by adding an import statement at the top of `driver.py`:
+Start by adding an import statement to `driver.py`:
 
 ```
 import foundations
@@ -117,19 +142,67 @@ print(generated_text)
  ```python
 foundations.log_metric("train loss", train_loss)
 foundations.log_metric("test loss", test_loss)
-foundations.log_metric("sample output", generated_text[:100])
+foundations.log_metric("sample output", generated_text[:20])
 ```
 
+Now submit a job again
+
+```bash
+$ foundations deploy --env scheduler 
+```
+
+You can log any number or string as a metric, anywhere in your code. For example, 
+you can add metrics such as ROC AUC or accuracy or a domain-specific business 
+metric. Metrics get posted to the job page
+as soon as they're recorded, so you can do things like have a Keras callback save
+a metric within the training loop. 
 
 
-### Explore parameter and architecture space 
+Let's go back to the jobs page: [https://35.231.226.217:6443/projects](https://35.231.226.217:6443/projects)
 
-In `utils.py` right now, we have a `params` dictionary. This is just a configuration of parameters for convenience so far. What we want is for Foundations to track our parameters for us! 
+You should be able to see the metrics you've saved in the right pane.
 
-Start by creating a new file [TODO how] in the `experiment_management/`, and copy the following code in:
+### Submit jobs via script
+
+In addition to submitting jobs via the command line, it's straightforward to submit
+them within python code as well.
+
+Start by creating a new file called `deploy_jobs.py` (or use any name) in the `experiment_management/` folder, and copy the following code in:
 
 ```python
 import foundations
+
+for _ in range(2):
+    foundations.deploy(
+        env="scheduler",
+        job_directory="experiments/text_generation_simple",
+        entrypoint="main.py",
+    )
+```
+
+Change directory out of the project folder
+and run the script we just created
+
+```bash
+cd ../..
+python experiment_management/deploy_jobs.py
+```
+
+Because of the loop we used, this will submit 2 jobs. 
+
+### Explore parameter and architecture space 
+
+In `utils.py` right now, we have a `params` dictionary. This is just a 
+configuration 
+of parameters for convenience so far. 
+
+Let's refactor a bit so Foundations will track our parameters for us! 
+
+Start by opening the deploy script we created in the `experiment_management/`
+
+Add the following code after `import foundations`
+
+```python
 import numpy as np
 
 def get_params():
@@ -143,32 +216,27 @@ def get_params():
         "dataset_url": "https://storage.googleapis.com/download.tensorflow.org/data/shakespeare.txt"
     }
     return params
-    
-for _ in range(5):
-    foundations.set_job_resources(num_gpus=0)
-    foundations.deploy(
-        env="scheduler",
-        job_directory="experiments/text_generation_simple",
-        entrypoint="src/driver.py",
-        params=gen_params(),
-    )
 ```
 
-Now in `driver.py`, delete line ???[TODO]
+Then to `foundations.deploy(...)`, add the parameter `params=get_params()`
+
+Now in `driver.py`, delete line ???
 
 ```python
 from utils import params
 ```
 
-And add the following line after `import foundations`:
+And add the following line somewhere after `import foundations`:
 
 ```python
 params = foundations.load_parameters()
 ```
 
-Now everytime you submit a job, foundations will generate a set of hyperparameters for you, and all hyperparameters will be tracked in the GUI.
+Now everytime you submit a job, foundations will generate a new set of 
+hyperparameters for you, and all hyperparameters will be tracked in the GUI.
 
 Let's try it out! 
+
 
 
 

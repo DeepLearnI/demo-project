@@ -7,10 +7,10 @@ slack_client = SlackClient('xoxp-6264324945-46768961556-314329155110-1f92449856f
 
 def get_params():
     params = {
-        "rnn_units": 1024, #np.random.randint(256, 2049),
-        "batch_size": 64, #np.random.randint(16, 256),
-        "embedding_dim": 256, #np.random.randint(128, 512),
-        "epochs": 15,
+        "rnn_units": 1024,
+        "batch_size": 64,
+        "embedding_dim": 256,
+        "epochs": 3,
         "seq_length": 100,
         "temperature": 1.,
         "dataset_url": "https://storage.googleapis.com/download.tensorflow.org/data/shakespeare.txt"
@@ -27,6 +27,7 @@ def post_slack_channel(msg):
         username="Major_Language_Model",
         icon_emoji=":arabsteve:"
     )
+
 
 def save_preprocessors(char2idx, idx2char, vocab):
     with open('artifacts/char2idx.pkl', 'wb') as file:
