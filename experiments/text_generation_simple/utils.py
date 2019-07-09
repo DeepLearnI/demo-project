@@ -10,7 +10,7 @@ def get_params():
         "rnn_units": 1024, #np.random.randint(256, 2049),
         "batch_size": 64, #np.random.randint(16, 256),
         "embedding_dim": 256, #np.random.randint(128, 512),
-        "epochs": 3,
+        "epochs": 15,
         "seq_length": 100,
         "temperature": 1.,
         "dataset_url": "https://storage.googleapis.com/download.tensorflow.org/data/shakespeare.txt"
@@ -28,12 +28,15 @@ def post_slack_channel(msg):
         icon_emoji=":arabsteve:"
     )
 
-def save_preprocessors(char2idx, idx2char):
+def save_preprocessors(char2idx, idx2char, vocab):
     with open('artifacts/char2idx.pkl', 'wb') as file:
         pickle.dump(char2idx, file)
 
     with open('artifacts/idx2char.pkl', 'wb') as file:
         pickle.dump(idx2char, file)
+
+    with open('artifacts/vocab.pkl', 'wb') as file:
+        pickle.dump(vocab, file)
 
 def load_preprocessors():
     with open('artifacts/char2idx.pkl', 'rb') as file:
@@ -42,4 +45,7 @@ def load_preprocessors():
     with open('artifacts/idx2char.pkl', 'rb') as file:
         idx2char = pickle.load(file)
 
-    return char2idx, idx2char
+    with open('artifacts/vocab.pkl', 'rb') as file:
+        vocab = pickle.load(file)
+
+    return char2idx, idx2char, vocab

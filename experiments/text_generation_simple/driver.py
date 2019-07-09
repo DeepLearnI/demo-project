@@ -12,6 +12,8 @@ We define the experiment to run as `result` and then use Foundations's `.run()` 
 Then you can run the driver file with `python main.py` to send the experiment off to be run. To check results, see the `/results` directory where you'll read and interact with results.
 """
 from utils import post_slack_channel
+import foundations
+import time
 
 try:
     from preprocessing import download_data, preprocess_data
@@ -20,12 +22,12 @@ try:
 
     path_to_file = download_data('https://storage.googleapis.com/download.tensorflow.org/data/shakespeare.txt', 'shakespeare.txt')
 
-    params = get_params()
+    params = foundations.load_parameters()
 
     dataset_train, dataset_test, steps_per_epoch_train, steps_per_epoch_test, vocab, char2idx, idx2char = preprocess_data(path_to_file, params)
 
     # Save preprocessors for serving
-    save_preprocessors(char2idx, idx2char)
+    save_preprocessors(char2idx, idx2char, vocab)
 
     model = Model(vocab,
                   embedding_dim=params['embedding_dim'],
@@ -45,7 +47,11 @@ try:
     test_loss = model.test(dataset_test, steps_per_epoch_test)
     print(test_loss)
 
-    generated_text = model.generate_text(start_string=u"ROMEO: ", checkpoint_dir='./training_checkpoints', temperature=params['temperature'])
+    model.set_test_mode(checkpoint_dir='./training_checkpoints')
+
+    start_time = time.time()
+    generated_text = model.generate(start_string=u"ROMEO: ", temperature=params['temperature'])
+    print('synthesis time: {}'.format(time.time() - start_time))
     print(generated_text)
     
 except Exception as e:
@@ -54,17 +60,3 @@ except Exception as e:
     trace = traceback.format_exc()
     post_slack_channel('Job failed. Catching Exception:\n{}'.format(trace))
     raise e
-
-
-def predict(input_text):
-    char2idx, idx2char = load_preprocessors()
-
-    model = Model(vocab,
-                  embedding_dim=params['embedding_dim'],
-                  rnn_units=params['rnn_units'],
-                  batch_size=params['batch_size'],
-                  char2idx=char2idx,
-                  idx2char=idx2char)
-
-    generated_text = model.generate_text(start_string=u"ROMEO: ", checkpoint_dir='./training_checkpoints', temperature=params['temperature'])
-    return generated_text

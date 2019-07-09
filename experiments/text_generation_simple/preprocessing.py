@@ -17,7 +17,7 @@ def split_input_target(chunk):
 def preprocess_data(path_to_file, params):
     # Read, then decode for py2 compat.
     text = open(path_to_file, 'rb').read().decode(encoding='utf-8')
-    text = text[:50000]
+    # text = text[:50000]
     
     # Get the unique characters in the file (vocab)
     vocab = sorted(set(text))

@@ -36,8 +36,7 @@ class Model:
 
     def build_model(self):
         model = tf.keras.Sequential([
-            tf.keras.layers.Embedding(self.vocab_size, self.embedding_dim,
-                                      batch_input_shape=[self.batch_size, None]),
+            tf.keras.layers.Embedding(self.vocab_size, self.embedding_dim, batch_input_shape=[self.batch_size, None]),
             self.rnn(self.rnn_units,
                      return_sequences=True,
                      recurrent_initializer='glorot_uniform',
@@ -45,6 +44,11 @@ class Model:
             tf.keras.layers.Dense(self.vocab_size)
         ])
         return model
+
+    def set_test_mode(self, checkpoint_dir):
+        self.batch_size = 1
+        self.model = self.build_model()
+        self.load_saved_model(checkpoint_dir=checkpoint_dir)
     
     def train(self, dataset, steps_per_epoch, checkpoint_dir='./training_checkpoints', epochs=30):
         # Directory where the checkpoints will be saved
@@ -102,15 +106,8 @@ class Model:
     
         return float(loss)
 
-    def generate_text(self, start_string, checkpoint_dir='./training_checkpoints', temperature=1.):
-        self.batch_size = 1
-        self.model = self.build_model()
+    def load_saved_model(self, checkpoint_dir):
         self.model.load_weights(tf.train.latest_checkpoint(checkpoint_dir))
-        self.model.build(tf.TensorShape([1, None]))
-
-        self.model.summary()
-        text = self.generate(start_string, temperature=temperature)
-        return text
 
     def generate(self, start_string, temperature=1.0):
         # Evaluation step (generating text using the learned model)
