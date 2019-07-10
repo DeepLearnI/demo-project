@@ -109,12 +109,7 @@ class Model:
     def load_saved_model(self, checkpoint_dir):
         self.model.load_weights(tf.train.latest_checkpoint(checkpoint_dir))
 
-    def generate(self, start_string, temperature=1.0):
-        # Evaluation step (generating text using the learned model)
-    
-        # Number of characters to generate
-        num_generate = 1000
-    
+    def generate(self, start_string, temperature=1.0, num_characters_to_generate=1000):
         # Converting our start string to numbers (vectorizing)
         input_eval = [self.char2idx[s] for s in start_string]
         input_eval = tf.expand_dims(input_eval, 0)
@@ -129,7 +124,7 @@ class Model:
     
         # Here batch size == 1
         self.model.reset_states()
-        for i in range(num_generate):
+        for i in range(num_characters_to_generate):
             predictions = self.model(input_eval)
             # remove the batch dimension
             predictions = tf.squeeze(predictions, 0)

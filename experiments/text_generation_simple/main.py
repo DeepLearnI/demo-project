@@ -42,7 +42,11 @@ print("Final test loss: {}".format(test_loss))
 model.set_test_mode(checkpoint_dir='./training_checkpoints')
 
 start_time = time.time()
-generated_text = model.generate(start_string=u"ROMEO: ", temperature=params['temperature'])
+generated_text = model.generate(
+    start_string=u"ROMEO: ",
+    temperature=params['temperature'],
+    num_characters_to_generate=25,
+)
 print('synthesis time: {}'.format(time.time() - start_time))
 print("Sample generated text: {}".format(generated_text))
 
