@@ -1,4 +1,10 @@
-![Dessa Logo](https://dessa.com/wp-content/uploads/2018/05/dessa_logo.svg)
+
+<img style="float: left;" src="https://dessa.com/wp-content/uploads/2018/05/dessa_logo.svg">
+<p align="right"> Powered by <img src="https://storage.googleapis.com/gweb-cloudblog-publish/images/f4xvje.max-200x200.PNG" height="50" width="50" align="right">
+</p>
+<br>
+<hr>
+
 
 # Welcome to Foundations
 
@@ -6,13 +12,14 @@
 
 Welcome to the Foundations trial environment! 
 
-In this tutorial we'll go through the process of optimizing and serving a simple text generator
+In this tutorial we'll go through the process of optimizing and serving a simple 
+text generator
 model (similar to GPT-2) using Foundations.
 
 This trial environment provides you with 
 a fully managed Foundations setup including:
 
-* 5 GPUs
+* 10 GPUs
 * Foundations, TensorFlow, and the Python scientific stack 
 (NumPy, pandas, etc) pre-installed 
 * A fully-featured in-browser IDE
@@ -23,25 +30,25 @@ or on cloud depending on your needs._
 
 
 
-In this trial we will start by some basic model code and using it 
+In this trial we will start by taking some basic model code and using it 
 to explore some of Foundations' most important features.
 
 
 This is what we'll achieve today:
 
-1. Without any Foundations-specific code at all, we will submit our code to be
+1. Without adding any Foundations-specific code at all, we will submit code to be
  executed on remote machines with multiple GPUs.
 
 1. We will then add our first lines of Foundations code to track and 
 share metrics of our choosing.
 
-1. We will optimise our model using Foundations' parameter and architecture
+1. We will optimise our model using Foundations' parameter/architecture
 search 
 feature and see how Foundations can execute multiple jobs 
 using all available computation resources. 
 
 1. We will then see how Foundations automatically tracks the parameters and 
-results of all of these in an experiment log, enabling full reproducibility.
+results of all of these in an experiment dashboard, enabling full reproducibility.
 
 1. Finally, we'll select the best model and serve it to a demo web app.  
 
@@ -52,7 +59,7 @@ results of all of these in an experiment log, enabling full reproducibility.
 To the right of this pane, you will see `main.py`. This is a piece of code that was 
 quickly written by one of our machine learning engineers _without using Foundations_. 
 
-The model is a language generator. We train it on 
+The model is a language generator. We will train it on 
 some Shakespearean text, and the resultant model 
  will be able to synthesize new text that sounds (ostensibly) like Shakespeare. 
  
@@ -60,8 +67,10 @@ Note that this code is nothing special right now; just some basic Python librari
 TensorFlow. We don't really have to modify it at all in the beginning to just submit it 
 to a cluster of GPU machines using Foundations. 
 
-The code is set to use a very short training time, so the early output may be 
-low quality or even nonsensical; this is just for speed, we'll train the model for longer 
+The code by default will not train for very long, so the output of initial
+runs may be 
+low quality or even nonsensical; this is just for speed, we'll train the model 
+for longer 
 later
 in the tutorial.
 
@@ -91,64 +100,52 @@ the job will continue running.
 
 Let's break down this command briefly: 
 
-* `foundations deploy` submits a job
-* `--env` looks for a configuration file by that name. In a long-term 
-project you might have need to submit jobs to different environments, 
-or have a configuration file for local submissions. 
+* `foundations deploy` submits a job to our GCP cluster
+* `--env scheduler` looks for a configuration file by the name "scheduler". The scheduler config file 
+tells Foundations where to run your jobs. It could be a GCP/AWS/Azure cluster or on-prem compute. 
 
-We are making use of defaults for a few others:
-
-* `--project-name` is a user-specified project title. It defaults to the 
-directory name. You can freely create new ones whenever you need
-* `--entrypoint` is the name of the script to run, it defaults 
-to `main.py` but can be specified manually
-
-For more guidance on this command, you can always use
+For more guidance on this command, you can always type 
 
 ```bash
 foundations deploy --help
 ```
 
-
-### 1.2 Look at GUI
-
-In a new tab, open [https://<IP>:<PORT>/projects](https://<IP>:<PORT>/projects). 
-Click on your Project.
-
-Note that we haven't tracked any metrics or submitted jobs with lots of 
-different parameters yet, but later in this tutorial we'll easily track them here. 
-
-The little icons indicate the status of a job. Green means success, yellow means currently running,
-red indicates a failure or unclean exit, and grey means the job is queued and not yet running.
+or visit the [documentation](https://dessa-foundations.readthedocs-hosted.com/en/demo_docs/).
 
 
-### 1.2 See latest logs
+### 1.2 Dashboard
 
-[TODO there should be a friendlier way, otherwise we'll show it later]
+In a new tab, open [https://IP:PORT/projects](https://<IP>:<PORT>/projects). 
+Click on your Project (Foundations allows you to manage multiple ML projects across
+your teams)
 
-Copy the job_id from the job you just submitted.
 
-Now in the terminal type
+At this point we only have one job running with no metrics or parameters tracked.
+
+The circular icons indicate the status of a job. Yellow means queued,
+ flashing green means the job is currently running
+ solid green means success, and
+ red indicates a failure or unclean exit.
+
+
+### 1.2 View latest logs
+
+Using the dashboard, copy the Job ID and in
+the terminal type
 
 ```
-$ foundations retrieve logs --env scheduler --job_id <copied_job_id>
+$ foundations retrieve logs --env scheduler --job_id <PASTED JOB ID>
 ```
 
 You can do this at any time while your jobs are running to print their 
 latest terminal output. This is also useful for investigating failed jobs. 
 
 
-### Receive Slack message
-
-[TODO] 
-
 ## Experiment queueing management
 
 Experiment management is a powerful feature. We can track all the 
 parameters and architectures 
 we try, and all metrics you can calculate in code about any particular experiment.
-
-[TODO]
 
 ### Log a metric 
 
