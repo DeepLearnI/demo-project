@@ -5,12 +5,15 @@ from utils import save_preprocessors, load_preprocessors
 
 
 params = {
+    "rnn_layers": 1,
     "rnn_units": 1024,
     "batch_size": 64,
+    "learning_rate": 0.001,
     "embedding_dim": 256,
-    "epochs": 3,
+    "epochs": 30,
     "seq_length": 100,
-    "temperature": 1.,
+    "temperature": .3,
+    "num_characters_to_generate": 200,
     "dataset_url": "https://storage.googleapis.com/download.tensorflow.org/data/shakespeare.txt"
 }
 
@@ -23,8 +26,10 @@ save_preprocessors(char2idx, idx2char, vocab)
 
 model = Model(vocab,
               embedding_dim=params['embedding_dim'],
+              rnn_layers=params['rnn_layers'],
               rnn_units=params['rnn_units'],
               batch_size=params['batch_size'],
+              learning_rate=params['learning_rate'],
               char2idx=char2idx,
               idx2char=idx2char)
 
@@ -45,7 +50,7 @@ start_time = time.time()
 generated_text = model.generate(
     start_string=u"ROMEO: ",
     temperature=params['temperature'],
-    num_characters_to_generate=25,
+    num_characters_to_generate=params['num_characters_to_generate'],
 )
 print('synthesis time: {}'.format(time.time() - start_time))
 print("Sample generated text: {}".format(generated_text))

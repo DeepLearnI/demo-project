@@ -13,14 +13,17 @@ tf.enable_eager_execution()
 
 
 class Model:
-    def __init__(self, vocab, embedding_dim, rnn_units, batch_size, char2idx, idx2char):
+    def __init__(self, vocab, embedding_dim, rnn_layers, rnn_units, batch_size, learning_rate, char2idx, idx2char):
         self.vocab_size = len(vocab)
         self.embedding_dim = embedding_dim
+        self.rnn_layers = rnn_layers
         self.rnn_units = rnn_units
         self.batch_size = batch_size
         self.char2idx = char2idx
         self.idx2char = idx2char
         self.loss = tf.losses.sparse_softmax_cross_entropy
+
+        self.learning_rate = learning_rate
 
         if tf.test.is_gpu_available():
             print('Using GPU')
@@ -36,12 +39,12 @@ class Model:
 
     def build_model(self):
         model = tf.keras.Sequential([
-            tf.keras.layers.Embedding(self.vocab_size, self.embedding_dim, batch_input_shape=[self.batch_size, None]),
-            self.rnn(self.rnn_units,
+            tf.keras.layers.Embedding(self.vocab_size, self.embedding_dim, batch_input_shape=[self.batch_size, None], name='embedding_layer'),
+            *[self.rnn(self.rnn_units,
                      return_sequences=True,
                      recurrent_initializer='glorot_uniform',
-                     stateful=True),
-            tf.keras.layers.Dense(self.vocab_size)
+                     stateful=True, name='rnn_layer_{}'.format(i)) for i in range(self.rnn_layers)],
+            tf.keras.layers.Dense(self.vocab_size, name='output_dense')
         ])
         return model
 
@@ -57,7 +60,7 @@ class Model:
         checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt_{epoch}")
 
         # Define the optimizer to use
-        optimizer = tf.train.AdamOptimizer()
+        optimizer = tf.train.AdamOptimizer(self.learning_rate)
         
         post_slack_channel('Training job starting')
 
@@ -87,7 +90,6 @@ class Model:
             if (epoch + 1) % 5 == 0:
                 self.model.save_weights(checkpoint_prefix.format(epoch=epoch))
     
-            print('Epoch {} Loss {:.4f}'.format(epoch + 1, loss))
             print('Time taken for 1 epoch {} sec\n'.format(time.time() - start))
 
         post_slack_channel('End of training: Epoch {} - Loss {}'.format(epoch + 1, loss))
