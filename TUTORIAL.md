@@ -4,25 +4,31 @@
 
 *Estimated time: 20 minutes*
 
-Welcome to the Foundations trial environment! This trial environment provides you with a fully managed Foundations setup including:
+Welcome to the Foundations trial environment! This trial environment provides you with 
+a fully managed Foundations setup including:
 
 * ??? GPUs
 * Foundations, TensorFlow, and Python scientific stack pre-installed 
 * An in-browser IDE
 
-Keep in mind Foundations is infrastructure-agnostic and can be set up on premise or on cloud depending on your needs.
+Keep in mind Foundations is infrastructure-agnostic and can be set up on premise 
+or on cloud depending on your needs.
 
-In this trial we will start by taking a basic recurrent language model and using it to explore some of Foundations' most important features.
+In this trial we will start by taking a basic recurrent language model and using it 
+to explore some of Foundations' most important features.
 
 This is what we'll achieve today:
 
-1. Without any Foundations-specific code at all, we will submit our code to be executed on a remote machine with a GPU
+1. Without any Foundations-specific code at all, we will submit our code to be
+ executed on a remote machine with a GPU
 
 1. We will then add our first lines of Foundations code to store metrics of our choosing
 
-1. We will try to optimise our model using Foundations' hyperparameter search feature. We will see how Foundations can execute multiple jobs using all available computation resources, and can track all parameters and results in an experiment log, allowing for full reproducibility.
+1. We will try to optimise our model using Foundations' hyperparameter search 
+feature. We will see how Foundations can execute multiple jobs using all available computation resources, and can track all parameters and results in an experiment log, allowing for full reproducibility.
 
-1. While doing this we will see how you can use Foundations to manage large scale experimentation.
+1. While doing this we will see how you can use Foundations to manage large i
+scale experimentation.
 
 1. Finally, we'll select the best model and show how easy it is to serve it. 
 
@@ -30,27 +36,36 @@ This is what we'll achieve today:
 
 ## 1 Hello, world!
 
-To the right of this pane, you will see `main.py`. This is a piece of code that was quickly written by one of our machine learning engineers _without using Foundations_. 
+To the right of this pane, you will see `main.py`. This is a piece of code that was 
+quickly written by one of our machine learning engineers _without using Foundations_. 
 
-The model is a language generator [TODO Mohammed doesn't like this]. We train it on some Shakespearean text so that we're able to synthesize new text that sounds like Shakespeare. 
+The model is a language generator. We train it on 
+some Shakespearean text, and the resultant model 
+ will be able to synthesize new text that sounds (ostensibly) like Shakespeare. 
  
-Note that this code is nothing special right now; just some basic Python libraries and TensorFlow. We don't really have to modify it at all in the beginning to just run it on a cluster of GPU machines using Foundations. 
+Note that this code is nothing special right now; just some basic Python libraries and 
+TensorFlow. We don't really have to modify it at all in the beginning to just run it 
+on a cluster of GPU machines using Foundations. 
+
+The code is set to use a small number of epochs, so the early output will be 
+low quality or even nonsensical; this is just for speed, we'll increase the number of
+epochs later in the tutorial.
 
 
 ### 1.1 Submit job
 
-Using this one command, we're going to take the code and run it on a remote server with a GPU, all with this one command!
+Using this one command, we're going to take the code and run it on a remote 
+server with a GPU, all with this one command!
 
 Underneath you'll see a terminal. 
 
-Start by `cd`ing into the project directory:
+Use the command below to `cd` into the project directory:
 
 ```bash
 $ cd experiments/text_generation_simple
 ```
 
-Go ahead and copy this command into the terminal, adding your 
-own `--project-name` if you like:
+Go ahead and copy this command into the terminal
 
 ```bash
 $ foundations deploy --env scheduler 
@@ -64,7 +79,7 @@ Let's break down this command briefly:
 * `foundations deploy` submits a job
 * `--env` looks for a configuration file by that name. In a long-term 
 project you might have need to submit jobs to different environments, 
-or want a configuration file for local submissions. [TODO clarify & expand]
+or want a configuration file for local submissions. 
 
 We are making use of defaults for a few others:
 
@@ -72,14 +87,24 @@ We are making use of defaults for a few others:
 directory name. You can freely create new ones whenever you need
 * `--entrypoint` is the name of the script to run, it defaults 
 to `main.py` but can be specified manually
-* [TODO]
+
+For guidance on this command, you can always use
+
+```bash
+foundations deploy --help
+```
+
 
 ### 1.2 Look at GUI
 
-In a new tab, open [https://<IP>:<PORT>/projects](https://<IP>:<PORT>/projects). Click the Project you're submitting jobs to.
+In a new tab, open [https://<IP>:<PORT>/projects](https://<IP>:<PORT>/projects). 
+Click on your Project.
 
 Note that we haven't tracked any metrics or submitted jobs with lots of 
 different parameters yet, but later in this tutorial we'll easily track them here. 
+
+The little icons indicate the status of a job. Green means success, yellow means currently running,
+red indicates a failure or unclean exit, and grey means the job is queued and not yet running.
 
 
 ### 1.2 See latest logs
@@ -104,7 +129,7 @@ latest terminal output. This is also useful for investigating failed jobs.
 
 ## Experiment queueing management
 
-Tracking experiments is powerful if you do [TODO]. We can track all the 
+Experiment management is a powerful feature. We can track all the 
 parameters and architectures 
 we try, and all metrics you can calculate in code about any particular experiment.
 
@@ -148,7 +173,7 @@ foundations.log_metric("sample output", generated_text[:20])
 Now submit a job again
 
 ```bash
-$ foundations deploy --env scheduler 
+$ foundations deploy --env scheduler
 ```
 
 You can log any number or string as a metric, anywhere in your code. For example, 
@@ -180,7 +205,8 @@ for _ in range(3):
     )
 ```
 
-Change directory out of the project folder
+Run these commands below to change directory out of the 
+project folder
 and run the script we just created
 
 ```bash
@@ -221,7 +247,7 @@ def get_params():
 Then to `foundations.deploy(...)`, add the parameter `params=get_params()`
 
 
-Now in `main.py` add the following line somewhere after `import foundations`:
+Now in `main.py` add the following line somewhere after line 15:
 
 ```python
 params = foundations.load_parameters()
@@ -230,7 +256,8 @@ params = foundations.load_parameters()
 Now every time you submit a job, foundations will generate a new set of 
 parameters for you which it will show in the GUI and track.
 
-Let's try it out! 
+Let's try it out by deploying a bunch of jobs 
+using just the following command in terminal: 
 
 ```bash
 python experiment_management/deploy_jobs.py
@@ -238,30 +265,98 @@ python experiment_management/deploy_jobs.py
 
 This will submit 3 jobs with 3 different sets of parameters.
 
-You can change the number in the loop we created in `deploy_jobs.py` and 
-do a larger search (try somewhere between 10 and 20 for now since the trial 
-environment includes 10 machines with GPUs). 
-
 
 ## Serving
 
 Foundations provides a standard format for packaging your 
 machine learning code so that can be productionized seamlessly.
 
-### Pick a best performing model
-
-
 
 ### Make code "serveable"
 
+Create a new file called `predict.py` file.
+
+```python
+from utils import load_preprocessors
+from model import Model
+import foundations
+
+
+char2idx, idx2char, vocab = load_preprocessors()
+
+params = foundations.load_parameters()
+
+model = Model(vocab,
+              embedding_dim=params['embedding_dim'],
+              rnn_units=params['rnn_units'],
+              batch_size=1,
+              char2idx=char2idx,
+              idx2char=idx2char)
+
+model.load_saved_model(checkpoint_dir='./training_checkpoints')
+
+def generate_prediction(input_text):
+    generated_text = model.generate(start_string=input_text, temperature=params['temperature'])
+    return generated_text
+```
+
+This will just load a saved model, and it surfaces a function called `predict`.
+
+Now we just need a configuration file. Create a new file called 
+`foundations_package_manifest.yaml` and paste the following text into it:
+
+```yaml
+entrypoints:
+    predict:
+        module: predict
+        function: generate_prediction
+
+```
+
+Once a manifest has been added to your root directory, 
+you will need to launch a new Foundations job in order for 
+Foundations to be able to directly serve it.
+
+
+### Do a hyperparameter search to get a good model!
+
+
+Change the number in the loop we created in `deploy_jobs.py` to do 
+a larger search, perhaps between 10 and 20 jobs since our
+environment includes 10 machines with GPUs. Set the `epochs` to somewhere around 30
+
+Now check the GUI and notice the different parameters we now have 
+for each job. As the jobs finish, you'll be able to compare
+the performance for the different sets of parameters we've 
+tested. 
+
+### Select the best job
+
+Look for the job with the lowest `test_loss` or perhaps your favourite generated
+text example! Copy that `job_id`
+
 ### Ask Foundations to serve it [TODO doesn't exist yet]
+
+In the terminal, enter
+
+```bash
+foundations serve start <JOB_ID>
+```
+
+Foundations automatically retrieves the bundle associated with the job_id 
+and wraps it in a REST API server, where requests can be made to the entrypoints, 
+specified by the `foundations_package_manifest.yaml` file
 
 ### Set up pre-baked web app [TODO doesn't exist yet]
 
 
+Go to the provided WebApp URL. For the Model Name, please use the IP address 
+given in the Slack message. Now try getting generated text
+from your served model!
+
+
 ## Load a large model from someone else, use as pretrained model for some new data (GPT)
 
-ALL OF THIS IS STILL TODO
 
 ### v1 code, retrieve pre-trained job
 
