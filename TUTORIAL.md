@@ -4,33 +4,46 @@
 
 *Estimated time: 20 minutes*
 
-Welcome to the Foundations trial environment! This trial environment provides you with 
+Welcome to the Foundations trial environment! 
+
+In this tutorial we'll go through the process of optimizing and serving a simple text generator
+model (similar to GPT-2) using Foundations.
+
+This trial environment provides you with 
 a fully managed Foundations setup including:
 
-* ??? GPUs
-* Foundations, TensorFlow, and Python scientific stack pre-installed 
-* An in-browser IDE
+* 5 GPUs
+* Foundations, TensorFlow, and the Python scientific stack 
+(NumPy, pandas, etc) pre-installed 
+* A fully-featured in-browser IDE
 
-Keep in mind Foundations is infrastructure-agnostic and can be set up on premise 
-or on cloud depending on your needs.
 
-In this trial we will start by taking a basic recurrent language model and using it 
+_Keep in mind Foundations is infrastructure-agnostic and can be set up on premise 
+or on cloud depending on your needs._
+
+
+
+In this trial we will start by some basic model code and using it 
 to explore some of Foundations' most important features.
+
 
 This is what we'll achieve today:
 
 1. Without any Foundations-specific code at all, we will submit our code to be
- executed on a remote machine with a GPU
+ executed on remote machines with multiple GPUs.
 
-1. We will then add our first lines of Foundations code to store metrics of our choosing
+1. We will then add our first lines of Foundations code to track and 
+share metrics of our choosing.
 
-1. We will try to optimise our model using Foundations' hyperparameter search 
-feature. We will see how Foundations can execute multiple jobs using all available computation resources, and can track all parameters and results in an experiment log, allowing for full reproducibility.
+1. We will optimise our model using Foundations' parameter and architecture
+search 
+feature and see how Foundations can execute multiple jobs 
+using all available computation resources. 
 
-1. While doing this we will see how you can use Foundations to manage large i
-scale experimentation.
+1. We will then see how Foundations automatically tracks the parameters and 
+results of all of these in an experiment log, enabling full reproducibility.
 
-1. Finally, we'll select the best model and show how easy it is to serve it. 
+1. Finally, we'll select the best model and serve it to a demo web app.  
 
 
 
@@ -44,18 +57,19 @@ some Shakespearean text, and the resultant model
  will be able to synthesize new text that sounds (ostensibly) like Shakespeare. 
  
 Note that this code is nothing special right now; just some basic Python libraries and 
-TensorFlow. We don't really have to modify it at all in the beginning to just run it 
-on a cluster of GPU machines using Foundations. 
+TensorFlow. We don't really have to modify it at all in the beginning to just submit it 
+to a cluster of GPU machines using Foundations. 
 
-The code is set to use a small number of epochs, so the early output will be 
-low quality or even nonsensical; this is just for speed, we'll increase the number of
-epochs later in the tutorial.
+The code is set to use a very short training time, so the early output may be 
+low quality or even nonsensical; this is just for speed, we'll train the model for longer 
+later
+in the tutorial.
 
 
 ### 1.1 Submit job
 
-Using this one command, we're going to take the code and run it on a remote 
-server with a GPU, all with this one command!
+Using one command, we're going to take our code and run it on a remote 
+server with a GPU.
 
 Underneath you'll see a terminal. 
 
@@ -72,14 +86,15 @@ $ foundations deploy --env scheduler
 ```
 
 Submitting a job like this will stream the output live; 
-you can stop it at any time using Ctrl+C, the job will continue running.
+you can stop the streaming at any time using Ctrl+C, 
+the job will continue running.
 
 Let's break down this command briefly: 
 
 * `foundations deploy` submits a job
 * `--env` looks for a configuration file by that name. In a long-term 
 project you might have need to submit jobs to different environments, 
-or want a configuration file for local submissions. 
+or have a configuration file for local submissions. 
 
 We are making use of defaults for a few others:
 
@@ -88,7 +103,7 @@ directory name. You can freely create new ones whenever you need
 * `--entrypoint` is the name of the script to run, it defaults 
 to `main.py` but can be specified manually
 
-For guidance on this command, you can always use
+For more guidance on this command, you can always use
 
 ```bash
 foundations deploy --help
@@ -335,7 +350,7 @@ tested.
 Look for the job with the lowest `test_loss` or perhaps your favourite generated
 text example! Copy that `job_id`
 
-### Ask Foundations to serve it [TODO doesn't exist yet]
+### Ask Foundations to serve it 
 
 In the terminal, enter
 
