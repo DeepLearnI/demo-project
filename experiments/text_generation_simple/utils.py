@@ -5,17 +5,6 @@ import pickle
 slack_client = SlackClient('xoxp-6264324945-46768961556-314329155110-1f92449856f0d07a99f7598ff31e9bf2')
 
 
-params = {
-    "rnn_units": 1024,
-    "batch_size": 64,
-    "embedding_dim": 256,
-    "epochs": 3,
-    "seq_length": 100,
-    "temperature": 1.,
-    "dataset_url": "https://storage.googleapis.com/download.tensorflow.org/data/shakespeare.txt"
-}
-
-
 def post_slack_channel(msg):
     slack_client.api_call(
         "chat.postMessage",
