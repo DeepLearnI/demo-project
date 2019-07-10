@@ -10,9 +10,9 @@ params = {
     "batch_size": 64,
     "learning_rate": 0.001,
     "embedding_dim": 256,
-    "epochs": 30,
+    "epochs": 3,
     "seq_length": 100,
-    "temperature": .3,
+    "temperature": 1.,
     "num_characters_to_generate": 200,
     "dataset_url": "https://storage.googleapis.com/download.tensorflow.org/data/shakespeare.txt"
 }
@@ -53,5 +53,4 @@ generated_text = model.generate(
     num_characters_to_generate=params['num_characters_to_generate'],
 )
 print('synthesis time: {}'.format(time.time() - start_time))
-print("Sample generated text: {}".format(generated_text))
-
+print("Sample generated text: \n{}".format(generated_text))
