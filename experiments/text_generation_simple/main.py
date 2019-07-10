@@ -34,15 +34,15 @@ model.train(dataset_train,
             epochs=params['epochs'],)
 
 train_loss = model.test(dataset_train, steps_per_epoch_train)
-print(train_loss)
+print("Final train loss: {}".format(train_loss))
 
 test_loss = model.test(dataset_test, steps_per_epoch_test)
-print(test_loss)
+print("Final test loss: {}".format(test_loss))
 
 model.set_test_mode(checkpoint_dir='./training_checkpoints')
 
 start_time = time.time()
 generated_text = model.generate(start_string=u"ROMEO: ", temperature=params['temperature'])
 print('synthesis time: {}'.format(time.time() - start_time))
-print(generated_text)
+print("Sample generated text: {}".format(generated_text))
 
