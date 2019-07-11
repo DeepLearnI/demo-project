@@ -12,12 +12,13 @@
 
 Welcome to the Foundations trial environment! 
 
-In this tutorial we'll go through the process of optimizing and serving a simple 
-text generator
+In this tutorial we'll go through the process of optimizing and 
+serving a simple text generator
 model (similar to GPT-2) using Foundations.
 
 This trial environment provides you with 
 a fully managed Foundations setup including:
+
 
 * 10 GPUs
 * Foundations, TensorFlow, and the Python scientific stack 
@@ -36,7 +37,8 @@ to explore some of Foundations' most important features.
 
 This is what we'll achieve today:
 
-1. Without adding any Foundations-specific code at all, we will submit code to be
+1. Without adding any Foundations-specific code at all, 
+we will submit code to be
  executed on remote machines with multiple GPUs.
 
 1. We will then add our first lines of Foundations code to track and 
@@ -53,114 +55,37 @@ results of all of these in an experiment dashboard, enabling full reproducibilit
 1. Finally, we'll select the best model and serve it to a demo web app.  
 
 
-
 ## 1 Hello, world!
 
 To the right of this pane, you will see `main.py`. This is a piece of code that was 
-quickly written by one of our machine learning engineers _without using Foundations_. 
+quickly assembled by one of our machine learning engineers _without using Foundations_. 
 
 The model is a language generator. We will train it on 
 some Shakespearean text, and the resultant model 
- will be able to synthesize new text that sounds (ostensibly) like Shakespeare. 
+will be able to synthesize new text that sounds 
+(ostensibly) like Shakespeare. 
  
-Note that this code is nothing special right now; just some basic Python libraries and 
-TensorFlow. We don't really have to modify it at all in the beginning to just submit it 
-to a cluster of GPU machines using Foundations. 
-
-The code by default will not train for very long, so the output of initial
-runs may be 
-low quality or even nonsensical; this is just for speed, we'll train the model 
-for longer 
-later
-in the tutorial.
+We're going to optimize the model performance using an architecture and parameter
+ search. 
 
 
-### 1.1 Submit job
-
-Using one command, we're going to take our code and run it on a remote 
-server with a GPU.
-
-Underneath you'll see a terminal. 
-
-Use the command below to `cd` into the project directory:
-
-```bash
-$ cd experiments/text_generation_simple
-```
-
-Go ahead and copy this command into the terminal
-
-```bash
-$ foundations deploy --env scheduler 
-```
-
-Submitting a job like this will stream the output live; 
-you can stop the streaming at any time using Ctrl+C, 
-the job will continue running.
-
-Let's break down this command briefly: 
-
-* `foundations deploy` submits a job to our GCP cluster
-* `--env scheduler` looks for a configuration file by the name "scheduler". The scheduler config file 
-tells Foundations where to run your jobs. It could be a GCP/AWS/Azure cluster or on-prem compute. 
-
-For more guidance on this command, you can always type 
-
-```bash
-foundations deploy --help
-```
-
-or visit the [documentation](https://dessa-foundations.readthedocs-hosted.com/en/demo_docs/).
+### 1.1 Architecture and parameter search
 
 
-### 1.2 Dashboard
-
-In a new tab, open [https://IP:PORT/projects](https://<IP>:<PORT>/projects). 
-Click on your Project (Foundations allows you to manage multiple ML projects across
-your teams)
-
-
-At this point we only have one job running with no metrics or parameters tracked.
-
-The circular icons indicate the status of a job. Yellow means queued,
- flashing green means the job is currently running
- solid green means success, and
- red indicates a failure or unclean exit.
-
-
-### 1.2 View latest logs
-
-Using the dashboard, copy the Job ID and in
-the terminal type
-
-```
-$ foundations retrieve logs --env scheduler --job_id <PASTED JOB ID>
-```
-
-You can do this at any time while your jobs are running to print their 
-latest terminal output. This is also useful for investigating failed jobs. 
-
-
-## Experiment queueing management
-
-Experiment management is a powerful feature. We can track all the 
-parameters and architectures 
-we try, and all metrics you can calculate in code about any particular experiment.
-
-### Log a metric 
+#### 1.1.1 Add metrics
 
 In `main.py` we already have a couple of lines that print 
 useful information about our model. It's easy to get Foundations to log them. 
 
 For now, let's track the train loss and test loss metrics we already have. [TODO rewrite]
 
-Start by adding an import statement to `main.py`:
+Start by adding an import statement to the top of `main.py`:
 
 ```
 import foundations
 ```
 
-Look for the following lines
+Now look at line <PLACEHOLDER>
 
 
 ```python
@@ -174,75 +99,38 @@ generated_text = model.generate_text(start_string=u"ROMEO: ", checkpoint_dir='./
 print(generated_text)
  ```
     
- All you need to do to track a metric using foundations is to call `log_metric` on any number or string you want foundations to save
+To track any performance metric using Foundations you can 
+call `log_metric` on any number or string:
  
  ```python
 foundations.log_metric("train loss", train_loss)
 foundations.log_metric("test loss", test_loss)
-foundations.log_metric("sample output", generated_text[:20])
+foundations.log_metric("sample output", generated_text)
 ```
 
-Now submit a job again
 
-```bash
-$ foundations deploy --env scheduler
-```
+#### 1.1.2 Create a job deployment script
 
-You can log any number or string as a metric, anywhere in your code. For example, 
-you can add metrics such as ROC AUC or accuracy or a domain-specific business 
-metric. Metrics get posted to the job page
-as soon as they're recorded, so you can do things like have a Keras callback save
-a metric within the training loop. 
+ Without Foundations, running a search over many 
+ architectures and sets of hyperparameters
+ is messy and difficult to manage.  Foundations makes this
+  straightforward! We're going to 
+ write a simple script to immediately kick off 
+ 100 jobs on our cluster.
 
+Create a new file called `submit_jobs.py` 
+in the `experiment_management/` folder, and add in the 
+following code:
 
-Let's go back to the jobs page: [https://<IP>:<PORT>/projects](https://<IP>:<PORT>/projects)
-
-You should be able to see the metrics you've saved in the right pane.
-
-### Submit jobs via script
-
-In addition to submitting jobs via the command line, it's straightforward to submit
-them within python code as well.
-
-Start by creating a new file called `deploy_jobs.py` (or use any name) in the `experiment_management/` folder, and copy the following code in:
 
 ```python
 import foundations
-
-for _ in range(3):
-    foundations.deploy(
-        env="scheduler",
-        job_directory="experiments/text_generation_simple",
-        entrypoint="main.py",
-    )
-```
-
-Run these commands below to change directory out of the 
-project folder
-and run the script we just created
-
-```bash
-cd ../..
-python experiment_management/deploy_jobs.py
-```
-
-Because of the loop we used, this will submit 3 jobs. 
-
-### Explore parameter and architecture space 
-
-At the top of `main.py`, we have a `params` dictionary. This is just a 
-configuration 
-of parameters for convenience so far. 
-
-Let's refactor a bit so Foundations will track our parameters for us! 
-
-Start by opening the deploy script we created in the `experiment_management/`
-
-Add the following code after `import foundations`
-
-```python
 import numpy as np
 
+NUM_JOBS = 100
+
+# Get params returns randomly generated architecture specifications 
+# and hyperparameters in the form of a dictionary
 def get_params():
     params = {
         "rnn_units": np.random.randint(256, 2049),
@@ -254,28 +142,60 @@ def get_params():
         "dataset_url": "https://storage.googleapis.com/download.tensorflow.org/data/shakespeare.txt"
     }
     return params
+    
+# A loop that calls the deploy method from the  
+# Foundations SDK which takes in a parameters dictionary
+# and the entrypoint script for our code
+for _ in range(NUM_JOBS):
+    foundations.deploy(
+        env="scheduler",
+        job_directory="experiments/text_generation_simple",
+        entrypoint="main.py",
+        project_name="a_project_name"
+        params=get_params(),
+    )
 ```
 
-Then to `foundations.deploy(...)`, add the parameter `params=get_params()`
-
-
-Now in `main.py` add the following line somewhere after line 15:
-
-```python
-params = foundations.load_parameters()
-```
-
-Now every time you submit a job, foundations will generate a new set of 
-parameters for you which it will show in the GUI and track.
-
-Let's try it out by deploying a bunch of jobs 
-using just the following command in terminal: 
+At the bottom of this window you'll see a terminal. 
+Type the following command
+ to launch the script we just wrote:
+ 
 
 ```bash
-python experiment_management/deploy_jobs.py
+$ python experiment_management/submit_jobs.py
 ```
 
-This will submit 3 jobs with 3 different sets of parameters.
+That's it! We're now using the full capacity 
+of our compute resources to explore our architecture and 
+parameter space through 100 models training 
+concurrently.
+
+Let's take a look at how they're doing.
+
+
+### 1.2 Dashboard
+
+Foundations provides a Dashboard that allows teams to monitor 
+and manage 
+multiple projects across a cluster. We can take a look at the 
+parameters and performance metrics of the 100 jobs we 
+submitted. 
+
+
+Click [here](DASHBOARD_URL) to open the Dashboard.
+
+
+[TODO place dot legend]
+
+Some jobs will already be completed. We added a sample
+of generated output as a metric — hover 
+over a few examples 
+to check how our initial models are doing.
+
+---
+---
+---
+
 
 
 ## Serving
