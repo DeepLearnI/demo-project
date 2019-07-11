@@ -93,12 +93,14 @@ NUM_JOBS = 100
 # and hyperparameters in the form of a dictionary
 def generate_params():
     params = {
-        "rnn_units": np.random.randint(256, 2049),
-        "batch_size": np.random.randint(16, 256),
-        "embedding_dim": np.random.randint(128, 512),
-        "epochs": 30,
+        "rnn_layers": np.random.randint(1, 4),
+        "rnn_units": np.random.randint(128, 513),
+        "batch_size": np.random.randint(32, 257),
+        "embedding_dim": np.random.randint(64, 257),
+        "epochs": np.random.randint(3, 11),
+        "learning_rate": np.random.choice([1e-3, 5e-3, 1e-2]),
         "seq_length": 100,
-        "temperature": 0.1,
+        "temperature": np.random.choice(np.arange(0.1, 1.1, 0.1)),
         "dataset_url": "https://storage.googleapis.com/download.tensorflow.org/data/shakespeare.txt"
     }
     return params

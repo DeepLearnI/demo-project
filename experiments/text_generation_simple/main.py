@@ -13,9 +13,9 @@ params = {
     "epochs": 3,
     "seq_length": 100,
     "temperature": 1.,
-    "num_characters_to_generate": 200,
     "dataset_url": "https://storage.googleapis.com/download.tensorflow.org/data/shakespeare.txt"
 }
+
 
 path_to_file = download_data('https://storage.googleapis.com/download.tensorflow.org/data/shakespeare.txt', 'shakespeare.txt')
 
@@ -45,12 +45,5 @@ test_loss = model.test(dataset_test, steps_per_epoch_test)
 print("Final test loss: {}".format(test_loss))
 
 model.set_test_mode(checkpoint_dir='./training_checkpoints')
-
-start_time = time.time()
-generated_text = model.generate(
-    start_string=u"ROMEO: ",
-    temperature=params['temperature'],
-    num_characters_to_generate=params['num_characters_to_generate'],
-)
-print('synthesis time: {}'.format(time.time() - start_time))
+generated_text = model.generate(start_string=u"ROMEO: ", num_characters_to_generate=25)
 print("Sample generated text: \n{}".format(generated_text))
