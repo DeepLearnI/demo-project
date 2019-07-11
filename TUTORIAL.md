@@ -222,7 +222,13 @@ submitted.
 Click [here](DASHBOARD_URL) to open the Dashboard.
 
 
-[TODO place dot color legend]
+| Icon           | Status                   |
+|----------------|--------------------------|
+|      green     | Job complete             |
+| green flashing | Currently running        |
+|     yellow     | Queued                   |
+|       red      | Job exited with an error |
+
 
 Some jobs will already be completed. We added a sample
 of generated output as a metric — hover 
