@@ -1,6 +1,5 @@
 
-<img style="float: left;" src="https://dessa.com/wp-content/uploads/2018/05/dessa_logo.svg">
-<p align="right"> Powered by <img src="https://storage.googleapis.com/gweb-cloudblog-publish/images/f4xvje.max-200x200.PNG" height="50" width="50" align="right">
+<img style="float: left;" src="https://dessa.com/wp-content/uploads/2018/05/dessa_logo.svg"><p align="right"> Powered by <img src="https://cloud.google.com/_static/images/cloud/icons/favicons/onecloud/super_cloud.png" height="50" width="50" align="right">
 </p>
 <br>
 <hr>
@@ -265,6 +264,7 @@ specified by the `foundations_package_manifest.yaml` file
 ### Set up pre-baked web app 
 
 
-Go to the provided WebApp URL. For the Model Name, please use the IP address 
+Go to the provided WebApp URL.  <TODO this needs better>
+For the Model Name, please use the IP address 
 given in the Slack message. Now try getting generated text
 from your served model!
