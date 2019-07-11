@@ -190,7 +190,7 @@ entrypoints:
 ```
 
 
-### Launch our architecture and parameter search!
+### Launch parameter search
 
 
 At the bottom of this window you'll see a terminal. 
@@ -268,3 +268,6 @@ Go to the provided WebApp URL.
 For the Model Name, please use the IP address 
 given in the Slack message. Now try getting generated text
 from your served model!
+
+
+feedback@dessa.com
