@@ -2,20 +2,11 @@ import time
 from preprocessing import download_data, preprocess_data
 from model import Model
 from utils import save_preprocessors, load_preprocessors
+import numpy as np
+import foundations
 
 
-params = {
-    "rnn_layers": 1,
-    "rnn_units": 1024,
-    "batch_size": 64,
-    "learning_rate": 0.001,
-    "embedding_dim": 256,
-    "epochs": 3,
-    "seq_length": 100,
-    "temperature": 1.,
-    "num_characters_to_generate": 200,
-    "dataset_url": "https://storage.googleapis.com/download.tensorflow.org/data/shakespeare.txt"
-}
+params = foundations.load_parameters()
 
 path_to_file = download_data('https://storage.googleapis.com/download.tensorflow.org/data/shakespeare.txt', 'shakespeare.txt')
 
@@ -40,9 +31,11 @@ model.train(dataset_train,
 
 train_loss = model.test(dataset_train, steps_per_epoch_train)
 print("Final train loss: {}".format(train_loss))
+foundations.log_metric('train_loss', train_loss)
 
 test_loss = model.test(dataset_test, steps_per_epoch_test)
 print("Final test loss: {}".format(test_loss))
+foundations.log_metric('test_loss', test_loss)
 
 model.set_test_mode(checkpoint_dir='./training_checkpoints')
 
@@ -54,3 +47,4 @@ generated_text = model.generate(
 )
 print('synthesis time: {}'.format(time.time() - start_time))
 print("Sample generated text: \n{}".format(generated_text))
+foundations.log_metric('generated_text', generated_text[:50])
