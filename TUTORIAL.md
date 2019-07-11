@@ -114,7 +114,7 @@ for _ in range(NUM_JOBS):
     )
 ```
 
-#### Load parameters from Foundations
+### Load parameters from Foundations
 
 Start by adding an import statement to the top of `main.py`:
 
@@ -129,13 +129,13 @@ Delete or comment that out and underneath add
 params = foundations.load_parameters()
 ```
 
-#### Track metrics
+### Track metrics
 
 In `main.py` we already have a couple of lines that print 
 useful information about our model. It's easy to get 
 Foundations to log them. 
 
-Go to line <PLACEHOLDER>
+At line 41, there is the following code: <TODO PLACEHOLDER verify line # is current>
 
 
 ```python
@@ -211,7 +211,7 @@ concurrently.
 Let's take a look at how they're doing.
 
 
-### 1.2 Dashboard
+## Dashboard
 
 Foundations provides a Dashboard that allows teams to monitor 
 and manage 
@@ -250,7 +250,7 @@ Go back to the Dashboard and look for the job
 with the lowest `test_loss` or perhaps your favourite generated
 text example! Copy that `job_id`
 
-### Ask Foundations to serve it 
+### Serve the model
 
 In the terminal, enter
 
