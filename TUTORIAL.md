@@ -1,5 +1,5 @@
-
-<img style="float: left;" src="https://dessa.com/wp-content/uploads/2018/05/dessa_logo.svg"><p align="right"> Powered by <img src="https://cloud.google.com/_static/images/cloud/icons/favicons/onecloud/super_cloud.png" height="50" width="50" align="right">
+<img style="float: left;" src="https://dessa.com/wp-content/uploads/2018/05/dessa_logo.svg" height="50">
+<p align="right"> Powered by <img src="https://cloud.google.com/_static/images/cloud/icons/favicons/onecloud/super_cloud.png" height="50" width="50" >
 </p>
 <br>
 <hr>
