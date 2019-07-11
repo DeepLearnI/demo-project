@@ -14,55 +14,51 @@ Welcome to the Foundations trial environment!
 
 In this tutorial we'll go through the process of optimizing and 
 serving a simple text generator
-model (similar to GPT-2) using Foundations.
+model using Foundations.
 
 This trial environment provides you with 
-a fully managed Foundations setup including:
+a fully managed Foundations setup, including:
 
 
-* 10 GPUs
+* 10 GPUs <TODO verify final>
 * Foundations, TensorFlow, and the Python scientific stack 
-(NumPy, pandas, etc) pre-installed 
-* A fully-featured in-browser IDE
+(NumPy, pandas, etc.) pre-installed 
+* An in-browser IDE 
 
 
-_Keep in mind Foundations is infrastructure-agnostic and can be set up on premise 
-or on cloud depending on your needs._
+Foundations is infrastructure-agnostic 
+and can be set up on-premise 
+or on the cloud. It can be used with any development environment.
 
 
 
 In this trial we will start by taking some basic model code and using it 
-to explore some of Foundations' most important features.
+to explore some of Foundations' key features.
 
 
 This is what we'll achieve today:
 
-1. Without adding any Foundations-specific code at all, 
-we will submit code to be
- executed on remote machines with multiple GPUs.
 
-1. We will then add our first lines of Foundations code to track and 
-share metrics of our choosing.
+1. With minimal effort, we will optimize our model with an 
+architecture and hyperparameter
+search on a cluster of remote machines with GPUs
 
-1. We will optimise our model using Foundations' parameter/architecture
-search 
-feature and see how Foundations can execute multiple jobs 
-using all available computation resources. 
+1. We will track and share metrics to assess model performance
 
-1. We will then see how Foundations automatically tracks the parameters and 
-results of all of these in an experiment dashboard, enabling full reproducibility.
+1. We will see how Foundations automatically tracks the parameters and 
+results of these experiments in a dashboard, enabling full reproducibility.
 
 1. Finally, we'll select the best model and serve it to a demo web app.  
 
 
-## 1 Hello, world!
 ## Architecture and parameter search
 
-To the right of this pane, you will see `main.py`. This is a piece of code that was 
-quickly assembled by one of our machine learning engineers _without using Foundations_. 
+To the right of this pane, you will see `main.py`. This code was 
+quickly assembled by one of our machine learning engineers without using 
+Foundations. 
 
 The model is a language generator. We will train it on 
-some Shakespearean text, and the resultant model 
+some Shakespearean text, and the resulting model 
 will be able to synthesize new text that sounds 
 (ostensibly) like Shakespeare. 
  
@@ -74,10 +70,10 @@ We're going to optimize the model performance using an architecture and paramete
 
  Without Foundations, running a search over many 
  architectures and sets of hyperparameters
- is messy and difficult to manage.  Foundations makes this
+ is messy and difficult to manage. Foundations makes this
   straightforward! We're going to 
  write a simple script to immediately kick off 
- 100 jobs on our cluster.
+ 100 jobs on our cluster. < TODO more marketing spiel is possible here>
 
 Create a new file called `submit_jobs.py` 
 in the `experiment_management/` folder, and add in the 
@@ -99,8 +95,8 @@ def generate_params():
         "embedding_dim": np.random.randint(64, 257),
         "epochs": np.random.randint(3, 11),
         "learning_rate": np.random.choice([1e-3, 5e-3, 1e-2]),
-        "seq_length": 100,
         "temperature": np.random.choice(np.arange(0.1, 1.1, 0.1)),
+        "seq_length": 100,
         "dataset_url": "https://storage.googleapis.com/download.tensorflow.org/data/shakespeare.txt"
     }
     return params
@@ -113,7 +109,7 @@ for _ in range(NUM_JOBS):
         env="scheduler",
         job_directory="experiments/text_generation_simple",
         entrypoint="main.py",
-        project_name="a_project_name"
+        project_name="a project name",
         params=generate_params(),
     )
 ```
