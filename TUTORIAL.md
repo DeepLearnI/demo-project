@@ -56,6 +56,7 @@ results of all of these in an experiment dashboard, enabling full reproducibilit
 
 
 ## 1 Hello, world!
+## Architecture and parameter search
 
 To the right of this pane, you will see `main.py`. This is a piece of code that was 
 quickly assembled by one of our machine learning engineers _without using Foundations_. 
@@ -69,47 +70,7 @@ We're going to optimize the model performance using an architecture and paramete
  search. 
 
 
-### 1.1 Architecture and parameter search
-
-
-#### 1.1.1 Add metrics
-
-In `main.py` we already have a couple of lines that print 
-useful information about our model. It's easy to get Foundations to log them. 
-
-For now, let's track the train loss and test loss metrics we already have. [TODO rewrite]
-
-Start by adding an import statement to the top of `main.py`:
-
-```
-import foundations
-```
-
-Now look at line <PLACEHOLDER>
-
-
-```python
-train_loss = model.test(dataset_train, steps_per_epoch_train)
-print(train_loss)
-
-test_loss = model.test(dataset_test, steps_per_epoch_test)
-print(test_loss)
-
-generated_text = model.generate_text(start_string=u"ROMEO: ", checkpoint_dir='./training_checkpoints', temperature=params['temperature'])
-print(generated_text)
- ```
-    
-To track any performance metric using Foundations you can 
-call `log_metric` on any number or string:
- 
- ```python
-foundations.log_metric("train loss", train_loss)
-foundations.log_metric("test loss", test_loss)
-foundations.log_metric("sample output", generated_text)
-```
-
-
-#### 1.1.2 Create a job deployment script
+### Create a job deployment script
 
  Without Foundations, running a search over many 
  architectures and sets of hyperparameters
@@ -122,7 +83,6 @@ Create a new file called `submit_jobs.py`
 in the `experiment_management/` folder, and add in the 
 following code:
 
-
 ```python
 import foundations
 import numpy as np
@@ -131,7 +91,7 @@ NUM_JOBS = 100
 
 # Get params returns randomly generated architecture specifications 
 # and hyperparameters in the form of a dictionary
-def get_params():
+def generate_params():
     params = {
         "rnn_units": np.random.randint(256, 2049),
         "batch_size": np.random.randint(16, 256),
@@ -145,16 +105,96 @@ def get_params():
     
 # A loop that calls the deploy method from the  
 # Foundations SDK which takes in a parameters dictionary
-# and the entrypoint script for our code
+# and the entrypoint script for our code (main.py)
 for _ in range(NUM_JOBS):
     foundations.deploy(
         env="scheduler",
         job_directory="experiments/text_generation_simple",
         entrypoint="main.py",
         project_name="a_project_name"
-        params=get_params(),
+        params=generate_params(),
     )
 ```
+
+#### Load parameters from Foundations
+
+Start by adding an import statement to the top of `main.py`:
+
+```python
+import foundations
+```
+
+Now on line 7 the code has a locally defined parameters dictionary.
+Delete or comment that out and underneath add
+
+```python
+params = foundations.load_parameters()
+```
+
+#### Track metrics
+
+In `main.py` we already have a couple of lines that print 
+useful information about our model. It's easy to get 
+Foundations to log them. 
+
+Go to line <PLACEHOLDER>
+
+
+```python
+train_loss = model.test(dataset_train, steps_per_epoch_train)
+print("Final train loss: {}".format(train_loss))
+
+test_loss = model.test(dataset_test, steps_per_epoch_test)
+print("Final test loss: {}".format(test_loss))
+
+model.set_test_mode(checkpoint_dir='./training_checkpoints')
+generated_text = model.generate(start_string=u"ROMEO: ", num_characters_to_generate=25)
+print("Sample generated text: \n{}".format(generated_text))
+ ```
+    
+To track any performance metric using Foundations, you can 
+call `log_metric`. Let's add the following lines:
+ 
+ ```python
+foundations.log_metric("train loss", train_loss)
+foundations.log_metric("test loss", test_loss)
+foundations.log_metric("sample output", generated_text)
+```
+
+Foundations can track any number or string in any part of your project code this way.
+
+
+### Prepare model for serving
+
+[TODO this section is scratch just do it for now ]
+
+Open `predict.py`, add an import statement to the top:
+
+```python
+import foundations
+```
+
+and replace the `params` dictionary with
+
+```python
+params = foundations.load_parameters()
+```
+
+
+Now we just need a configuration file. Create a new file called 
+`foundations_package_manifest.yaml` and paste the following text into it:
+
+```yaml
+entrypoints:
+    predict:
+        module: predict
+        function: generate_prediction
+
+```
+
+
+### Launch our architecture and parameter search!
+
 
 At the bottom of this window you'll see a terminal. 
 Type the following command
@@ -185,7 +225,7 @@ submitted.
 Click [here](DASHBOARD_URL) to open the Dashboard.
 
 
-[TODO place dot legend]
+[TODO place dot color legend]
 
 Some jobs will already be completed. We added a sample
 of generated output as a metric — hover 
@@ -203,68 +243,13 @@ to check how our initial models are doing.
 Foundations provides a standard format for packaging your 
 machine learning code so that can be productionized seamlessly.
 
-
-### Make code "serveable"
-
-Create a new file called `predict.py` file.
-
-```python
-from utils import load_preprocessors
-from model import Model
-import foundations
+This is why we have a separate `predict.py` function and why we created the serving `yaml` [TODO]
 
 
-char2idx, idx2char, vocab = load_preprocessors()
+### Select the best model
 
-params = foundations.load_parameters()
-
-model = Model(vocab,
-              embedding_dim=params['embedding_dim'],
-              rnn_units=params['rnn_units'],
-              batch_size=1,
-              char2idx=char2idx,
-              idx2char=idx2char)
-
-model.load_saved_model(checkpoint_dir='./training_checkpoints')
-
-def generate_prediction(input_text):
-    generated_text = model.generate(start_string=input_text, temperature=params['temperature'])
-    return generated_text
-```
-
-This will just load a saved model, and it surfaces a function called `predict`.
-
-Now we just need a configuration file. Create a new file called 
-`foundations_package_manifest.yaml` and paste the following text into it:
-
-```yaml
-entrypoints:
-    predict:
-        module: predict
-        function: generate_prediction
-
-```
-
-Once a manifest has been added to your root directory, 
-you will need to launch a new Foundations job in order for 
-Foundations to be able to directly serve it.
-
-
-### Do a hyperparameter search to get a good model!
-
-
-Change the number in the loop we created in `deploy_jobs.py` to do 
-a larger search, perhaps between 10 and 20 jobs since our
-environment includes 10 machines with GPUs. Set the `epochs` to somewhere around 30
-
-Now check the GUI and notice the different parameters we now have 
-for each job. As the jobs finish, you'll be able to compare
-the performance for the different sets of parameters we've 
-tested. 
-
-### Select the best job
-
-Look for the job with the lowest `test_loss` or perhaps your favourite generated
+Go back to the Dashboard and look for the job 
+with the lowest `test_loss` or perhaps your favourite generated
 text example! Copy that `job_id`
 
 ### Ask Foundations to serve it 
@@ -279,20 +264,9 @@ Foundations automatically retrieves the bundle associated with the job_id
 and wraps it in a REST API server, where requests can be made to the entrypoints, 
 specified by the `foundations_package_manifest.yaml` file
 
-### Set up pre-baked web app [TODO doesn't exist yet]
+### Set up pre-baked web app 
 
 
 Go to the provided WebApp URL. For the Model Name, please use the IP address 
 given in the Slack message. Now try getting generated text
 from your served model!
-
-
-## Load a large model from someone else, use as pretrained model for some new data (GPT)
-
-
-### v1 code, retrieve pre-trained job
-
-### retrain (hopefully)
-
-### serve
-
