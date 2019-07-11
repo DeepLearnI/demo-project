@@ -8,7 +8,7 @@ import foundations
 
 params = foundations.load_parameters()
 
-path_to_file = download_data('https://storage.googleapis.com/download.tensorflow.org/data/shakespeare.txt', 'shakespeare.txt')
+path_to_file = download_data('https://storage.googleapis.com/download.tensorflow.org/data/shakespeare.txt', '/tmp/shakespeare.txt')
 
 dataset_train, dataset_test, steps_per_epoch_train, steps_per_epoch_test, vocab, char2idx, idx2char = preprocess_data(path_to_file, params)
 
@@ -27,7 +27,7 @@ model = Model(vocab,
 model.train(dataset_train,
             steps_per_epoch=steps_per_epoch_train,
             checkpoint_dir='./training_checkpoints',
-            epochs=params['epochs'],)
+            epochs=params['epochs'])
 
 train_loss = model.test(dataset_train, steps_per_epoch_train)
 print("Final train loss: {}".format(train_loss))
@@ -47,4 +47,4 @@ generated_text = model.generate(
 )
 print('synthesis time: {}'.format(time.time() - start_time))
 print("Sample generated text: \n{}".format(generated_text))
-foundations.log_metric('generated_text', generated_text[:50])
+foundations.log_metric('sample_text', generated_text[:50])
