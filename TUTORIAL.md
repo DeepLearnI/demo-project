@@ -121,16 +121,15 @@ Start by adding an import statement to the top of `main.py`:
 import foundations
 ```
 
-Now on line 7 the code has a locally defined parameters dictionary.
-Delete or comment that out and underneath add
-
+Now on line 7, the code has a locally defined parameters dictionary.
+Replace that with the following line:
 ```python
 params = foundations.load_parameters()
 ```
 
 ### Track metrics
 
-In `main.py` we already have a couple of lines that print 
+In `main.py` we have lines which print 
 useful information about our model. It's easy to get 
 Foundations to log them. 
 
@@ -165,20 +164,20 @@ Foundations can track any number or string in any part of your project code this
 
 [TODO this section is scratch just do it for now ]
 
-Open `predict.py`, add an import statement to the top:
+Open `predict.py` and add an import statement to the top:
 
 ```python
 import foundations
 ```
 
-and replace the `params` dictionary with
+Also replace the `params` dictionary with
 
 ```python
 params = foundations.load_parameters()
 ```
 
 
-Now we just need a configuration file. Create a new file called 
+Now we need a configuration file. Create a new file called 
 `foundations_package_manifest.yaml` and paste the following text into it:
 
 ```yaml
@@ -186,7 +185,6 @@ entrypoints:
     predict:
         module: predict
         function: generate_prediction
-
 ```
 
 
@@ -203,8 +201,8 @@ $ python experiment_management/submit_jobs.py
 ```
 
 That's it! We're now using the full capacity 
-of our compute resources to explore our architecture and 
-parameter space through 100 models training 
+of available compute resources to explore our architecture and 
+parameter space by training 100 models 
 concurrently.
 
 Let's take a look at how they're doing.
@@ -212,14 +210,14 @@ Let's take a look at how they're doing.
 
 ## Dashboard
 
-Foundations provides a Dashboard that allows teams to monitor 
+Foundations provides a dashboard that allows teams to monitor 
 and manage 
 multiple projects across a cluster. We can take a look at the 
-parameters and performance metrics of the 100 jobs we 
+parameters and performance metrics of all the jobs we 
 submitted. 
 
 
-Click [here](DASHBOARD_URL) to open the Dashboard.
+Click [here](DASHBOARD_URL) to open the dashboard.
 
 
 | Icon           | Status                   |
@@ -233,7 +231,7 @@ Click [here](DASHBOARD_URL) to open the Dashboard.
 Some jobs will already be completed. We added a sample
 of generated output as a metric — hover 
 over a few examples 
-to check how our initial models are doing.
+to see how our initial models are doing.
 
 ---
 ---
@@ -243,17 +241,16 @@ to check how our initial models are doing.
 
 ## Serving
 
-Foundations provides a standard format for packaging your 
-machine learning code so that can be productionized seamlessly.
+Foundations provides a standard format to seamlessly package machine learning models for production.
 
-This is why we have a separate `predict.py` function and why we created the serving `yaml` earlier.
+We will use the `predict.py` function and package `yaml` created earlier to serve the model.
 
 
 ### Select the best model
 
-Go back to the Dashboard and look for the job 
-with the lowest `test_loss` or perhaps your favourite generated
-text example! Copy that `job_id`
+On the dashboard, select a job to serve. It is recommended to choose the one
+with the lowest `test_loss`, or perhaps your favourite generated
+text example. Copy the `job_id`.
 
 ### Serve the model
 
@@ -264,15 +261,15 @@ foundations serve start <JOB_ID>
 ```
 
 Foundations automatically retrieves the bundle associated with the job_id 
-and wraps it in a REST API server, where requests can be made to the entrypoints, 
-specified by the `foundations_package_manifest.yaml` file
+and wraps it in a REST API. Requests can be made to the entrypoints 
+specified by the `foundations_package_manifest.yaml` file.
 
 ### Set up pre-baked web app 
 
 
 Go to the provided WebApp URL. 
-For the Model Name, please use the IP address 
-given in the Slack message. Now try getting generated text
+For the Model Name, use the IP address 
+given in the Slack message. Now try outputting generated text
 from your served model!
 
 
