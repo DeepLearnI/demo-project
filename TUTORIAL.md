@@ -19,7 +19,7 @@ This trial environment provides you with
 a fully managed Foundations setup, including:
 
 
-* 10 GPUs <TODO verify final>
+* 10 GPUs 
 * Foundations, TensorFlow, and the Python scientific stack 
 (NumPy, pandas, etc.) pre-installed 
 * An in-browser IDE 
@@ -72,7 +72,7 @@ We're going to optimize the model performance using an architecture and paramete
  is messy and difficult to manage. Foundations makes this
   straightforward! We're going to 
  write a simple script to immediately kick off 
- 100 jobs on our cluster. < TODO more marketing spiel is possible here>
+ 100 jobs on our cluster. 
 
 Create a new file called `submit_jobs.py` 
 in the `experiment_management/` folder, and add in the 
@@ -134,7 +134,7 @@ In `main.py` we already have a couple of lines that print
 useful information about our model. It's easy to get 
 Foundations to log them. 
 
-At line 41, there is the following code: <TODO PLACEHOLDER verify line # is current>
+At line 41, there is the following code:
 
 
 ```python
@@ -240,7 +240,7 @@ to check how our initial models are doing.
 Foundations provides a standard format for packaging your 
 machine learning code so that can be productionized seamlessly.
 
-This is why we have a separate `predict.py` function and why we created the serving `yaml` [TODO]
+This is why we have a separate `predict.py` function and why we created the serving `yaml` earlier.
 
 
 ### Select the best model
@@ -264,7 +264,7 @@ specified by the `foundations_package_manifest.yaml` file
 ### Set up pre-baked web app 
 
 
-Go to the provided WebApp URL.  <TODO this needs better>
+Go to the provided WebApp URL. 
 For the Model Name, please use the IP address 
 given in the Slack message. Now try getting generated text
 from your served model!
