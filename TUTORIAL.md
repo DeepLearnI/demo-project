@@ -40,7 +40,7 @@ This is what we'll achieve today:
 
 1. With minimal effort, we will optimize our model with an 
 architecture and hyperparameter
-search on a cluster of remote machines with GPUs
+search on a cluster of machines with GPUs on Google Cloud Platform
 
 1. We will track and share metrics to assess model performance
 
@@ -49,6 +49,19 @@ results of these experiments in a dashboard, enabling full reproducibility.
 
 1. Finally, we'll select the best model and serve it to a demo web app.  
 
+## Hello, world!
+
+Let's submit a job with Foundations. Run the following command in the terminal:
+
+```bash
+$ foundations deploy --env scheduler --job-directory experiments/text_generation_simple
+```
+
+Congratulations! The job is running and the model is training remotely on GPUs. 
+
+Any code can be submitted in this way without modifications. 
+
+Now let's scale up our experimentation with Foundations.
 
 ## Architecture and parameter search
 
@@ -56,7 +69,7 @@ To the right of this pane, you will see `main.py`. This code was
 quickly assembled by one of our machine learning engineers without using 
 Foundations. 
 
-The model is a language generator. We will train it on 
+The model is a [GRU](https://en.wikipedia.org/wiki/Gated_recurrent_unit) (gated recurrent unit) language generator. We will train it on 
 some Shakespearean text, and the resulting model 
 will be able to synthesize new text that sounds 
 (ostensibly) like Shakespeare. 
@@ -74,8 +87,7 @@ We're going to optimize the model performance using an architecture and paramete
  write a simple script to immediately kick off 
  100 jobs on our cluster. 
 
-Create a new file called `submit_jobs.py` 
-in the `experiment_management/` folder, and add in the 
+In the editor, right click on the `experiment_management/` folder and create a new file called `submit_jobs.py`. Add in the 
 following code:
 
 ```python
@@ -121,7 +133,7 @@ Start by adding an import statement to the top of `main.py`:
 import foundations
 ```
 
-Now on line 7, the code has a locally defined parameters dictionary.
+Beginning on line 7, the code has a locally defined parameters dictionary.
 Replace that with the following line:
 ```python
 params = foundations.load_parameters()
@@ -143,7 +155,10 @@ print("Final train loss: {}".format(train_loss))
 test_loss = model.test(dataset_test, steps_per_epoch_test)
 print("Final test loss: {}".format(test_loss))
 
+# Change the model to test mode
 model.set_test_mode(checkpoint_dir='./training_checkpoints')
+
+# Prompt the model to output text in the desired format
 generated_text = model.generate(start_string=u"ROMEO: ", num_characters_to_generate=25)
 print("Sample generated text: \n{}".format(generated_text))
  ```
@@ -177,7 +192,9 @@ params = foundations.load_parameters()
 ```
 
 
-Now we need a configuration file. Create a new file called 
+Now we need a configuration file to standardize the model entrypoint for serving.
+
+Right-click on the the `text_generation_simple` folder and create a new file called 
 `foundations_package_manifest.yaml` and paste the following text into it:
 
 ```yaml
