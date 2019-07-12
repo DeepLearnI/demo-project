@@ -290,9 +290,9 @@ from your served model!
 
 ## Next steps
 
-We want to hear your feedback about Foundations! 
+We want to hear your what you think about Foundations! 
 
-* Fill out this 5-minute [feedback survey](FEEDBACK_URL)
+* Fill out this [feedback survey](https://docs.google.com/forms/d/1Zs4vZViKgdsa6_0KwgUNIA5MgVAcN77RrX8YN4kxqfo)
 * Tell us what you thought of Foundations
 [via email](mailto:foundations@dessa.com)
 * Tweet us [@Dessa](https://twitter.com/dessa) with your 
