@@ -1,23 +1,21 @@
-import time
 from preprocessing import download_data, preprocess_data
 from model import Model
 from utils import save_preprocessors, load_preprocessors
-
+import numpy as np
 
 params = {
-    "rnn_layers": 1,
-    "rnn_units": 1024,
-    "batch_size": 64,
-    "learning_rate": 0.001,
-    "embedding_dim": 256,
-    "epochs": 3,
-    "seq_length": 100,
-    "temperature": 1.,
-    "dataset_url": "https://storage.googleapis.com/download.tensorflow.org/data/shakespeare.txt"
-}
+        "rnn_layers": 3,
+        "rnn_units": 512,
+        "batch_size": 64,
+        "learning_rate": 0.001,
+        "embedding_dim": 256,
+        "epochs": 3,
+        "seq_length": 100,
+        "temperature": .2,
+        "dataset_url": "https://storage.googleapis.com/download.tensorflow.org/data/shakespeare.txt"
+    }
 
-
-path_to_file = download_data('https://storage.googleapis.com/download.tensorflow.org/data/shakespeare.txt', 'shakespeare.txt')
+path_to_file = download_data(params['dataset_url'], '/tmp/shakespeare.txt')
 
 dataset_train, dataset_test, steps_per_epoch_train, steps_per_epoch_test, vocab, char2idx, idx2char = preprocess_data(path_to_file, params)
 
@@ -36,7 +34,7 @@ model = Model(vocab,
 model.train(dataset_train,
             steps_per_epoch=steps_per_epoch_train,
             checkpoint_dir='./training_checkpoints',
-            epochs=params['epochs'],)
+            epochs=params['epochs'])
 
 train_loss = model.test(dataset_train, steps_per_epoch_train)
 print("Final train loss: {}".format(train_loss))
@@ -48,5 +46,5 @@ print("Final test loss: {}".format(test_loss))
 model.set_test_mode(checkpoint_dir='./training_checkpoints')
 
 # Prompt the model to output text in the desired format
-generated_text = model.generate(start_string=u"ROMEO: ", num_characters_to_generate=25)
+generated_text = model.generate(start_string=u"ROMEO: ", num_characters_to_generate=50)
 print("Sample generated text: \n{}".format(generated_text))

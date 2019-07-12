@@ -1,6 +1,5 @@
 import tensorflow as tf
 import numpy as np
-from sklearn.model_selection import train_test_split
 
 
 def download_data(remote_path, local_path):
@@ -17,7 +16,6 @@ def split_input_target(chunk):
 def preprocess_data(path_to_file, params):
     # Read, then decode for py2 compat.
     text = open(path_to_file, 'rb').read().decode(encoding='utf-8')
-    # text = text[:50000]
     
     # Get the unique characters in the file (vocab)
     vocab = sorted(set(text))
@@ -32,7 +30,7 @@ def preprocess_data(path_to_file, params):
     # The maximum length sentence we want for a single input in characters
     seq_length = params['seq_length']
     
-    text_as_int_train, text_as_int_test = text_as_int[:int(len(text_as_int) * 0.8)], text_as_int[int(-0.2 * len(text_as_int)):]
+    text_as_int_train, text_as_int_test = text_as_int[:int(len(text_as_int) * 0.9)], text_as_int[int(-0.1 * len(text_as_int)):]
     
     examples_per_epoch_train = len(text_as_int_train) // seq_length
     examples_per_epoch_test = len(text_as_int_test) // seq_length
