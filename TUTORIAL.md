@@ -85,15 +85,18 @@ We're going to optimize the model performance using an architecture and paramete
  is messy and difficult to manage. Foundations makes this
   straightforward! We're going to 
  write a simple script to immediately kick off 
- 100 jobs on our cluster. 
+ 100 jobs of a random search on our cluster. 
 
-In the editor, right click on the `experiment_management/` folder and create a new file called `submit_jobs.py`. Add in the 
+In the editor, right click on the `experiment_management/` folder 
+and create a 
+new file called `submit_jobs.py`. Add in the 
 following code:
 
 ```python
 import foundations
 import numpy as np
 
+# Constant for the number of models to be submitted 
 NUM_JOBS = 100
 
 # Get params returns randomly generated architecture specifications 
@@ -145,7 +148,7 @@ In `main.py` we have lines which print
 useful information about our model. It's easy to get 
 Foundations to log them. 
 
-At line 41, there is the following code:
+Around line 30, there is the following code:
 
 
 ```python
@@ -164,7 +167,7 @@ print("Sample generated text: \n{}".format(generated_text))
  ```
     
 To track any performance metric using Foundations, you can 
-call `log_metric`. Let's add the following lines:
+call `log_metric`. Let's add the following lines to the bottom of `main.py`:
  
  ```python
 foundations.log_metric("train loss", train_loss)
@@ -177,7 +180,8 @@ Foundations can track any number or string in any part of your project code this
 
 ### Prepare model for serving
 
-[TODO this section is scratch just do it for now ]
+In order to serve the model later, we'll need to prepare the `predict.py` 
+entrypoint and create a configuration file.
 
 Open `predict.py` and add an import statement to the top:
 
@@ -194,7 +198,7 @@ params = foundations.load_parameters()
 
 Now we need a configuration file to standardize the model entrypoint for serving.
 
-Right-click on the the `text_generation_simple` folder and create a new file called 
+Right-click on the `text_generation_simple` folder and create a new file called 
 `foundations_package_manifest.yaml` and paste the following text into it:
 
 ```yaml

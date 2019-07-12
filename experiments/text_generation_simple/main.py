@@ -44,6 +44,9 @@ print("Final train loss: {}".format(train_loss))
 test_loss = model.test(dataset_test, steps_per_epoch_test)
 print("Final test loss: {}".format(test_loss))
 
+# Change the model to test mode
 model.set_test_mode(checkpoint_dir='./training_checkpoints')
+
+# Prompt the model to output text in the desired format
 generated_text = model.generate(start_string=u"ROMEO: ", num_characters_to_generate=25)
 print("Sample generated text: \n{}".format(generated_text))
