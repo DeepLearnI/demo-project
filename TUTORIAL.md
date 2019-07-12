@@ -290,5 +290,11 @@ For the Model Name, use the IP address
 given in the Slack message. Now try outputting generated text
 from your served model!
 
+### Next steps
 
-feedback@dessa.com
+We want to hear your feedback about Foundations! 
+
+* Fill out this 5-minute [feedback survey](link to Google form)
+* Tell us what you thought of Foundations
+[via email](mailto:feedback@dessa.com)
+* Tweet us [@Dessa](https://twitter.com/dessa) with your best model-generated text using [#FoundationsML](https://twitter.com/search?q=%23FoundationsML)
