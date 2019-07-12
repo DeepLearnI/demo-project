@@ -29,7 +29,7 @@ Foundations is infrastructure-agnostic
 and can be set up on-premise 
 or on the cloud. It can be used with any development environment.
 
-<img src="https://raw.githubusercontent.com/DeepLearnI/demo-project/master/f9s_workflow.png">
+<img src="https://dessa.com/wp-content/uploads/2019/07/f9s_workflow.png">
 
 In this trial we will start by taking some basic model code and using it 
 to explore some of Foundations' key features.
