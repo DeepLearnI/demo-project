@@ -104,13 +104,14 @@ NUM_JOBS = 20
 def generate_params():
     params = {
         "rnn_layers": np.random.randint(1, 4),
-        "rnn_units": np.random.randint(128, 513),
-        "batch_size": np.random.randint(32, 257),
-        "embedding_dim": np.random.randint(64, 257),
-        "epochs": np.random.randint(3, 11),
-        "learning_rate": np.random.choice([1e-3, 5e-3, 1e-2]),
-        "temperature": np.random.choice(np.arange(0.1, 1.1, 0.1)),
+        "rnn_units": int(np.random.choice([128, 256, 512])),
+        "batch_size": int(np.random.choice([32, 64, 128, 256])),
+        "learning_rate": np.random.choice([0.001, 0.01, 0.005]),
+        "embedding_dim": np.random.randint(128, 257),
+        "epochs": np.random.randint(5, 21),
         "seq_length": 100,
+        "temperature": np.random.choice([.2, .3, .4]),
+        "num_characters_to_generate": 200,
         "dataset_url": "https://storage.googleapis.com/download.tensorflow.org/data/shakespeare.txt"
     }
     return params
