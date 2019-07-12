@@ -123,7 +123,7 @@ for _ in range(NUM_JOBS):
         env="scheduler",
         job_directory="experiments/text_generation_simple",
         entrypoint="main.py",
-        project_name="a project name",
+        project_name="text_generation_simple",
         params=generate_params(),
     )
 ```
