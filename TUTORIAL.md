@@ -85,7 +85,7 @@ We're going to optimize the model performance using an architecture and paramete
  is messy and difficult to manage. Foundations makes this
   straightforward! We're going to 
  write a simple script to immediately kick off 
- 100 jobs of a random search on our cluster. 
+ 20 jobs of a random search on our cluster. 
 
 In the editor, right click on the `experiment_management/` folder 
 and create a 
@@ -97,7 +97,7 @@ import foundations
 import numpy as np
 
 # Constant for the number of models to be submitted 
-NUM_JOBS = 100
+NUM_JOBS = 20 
 
 # Get params returns randomly generated architecture specifications 
 # and hyperparameters in the form of a dictionary
@@ -223,7 +223,7 @@ $ python experiment_management/submit_jobs.py
 
 That's it! We're now using the full capacity 
 of available compute resources to explore our architecture and 
-parameter space by training 100 models 
+parameter space by training 20 models 
 concurrently.
 
 Let's take a look at how they're doing.
