@@ -85,7 +85,7 @@ We're going to optimize the model performance using an architecture and hyperpar
  is messy and difficult to manage. Foundations makes this
   straightforward! We're going to 
  write a simple script to immediately kick off 
- 20 jobs of a random search on our cluster. 
+ a set of jobs of a random search on our cluster. 
 
 In the editor, right click on the `experiment_management/` folder 
 and create a 
@@ -213,7 +213,7 @@ $ python experiment_management/submit_jobs.py
 
 That's it! Foundations is now using the full capacity 
 of available compute resources to explore our architecture and 
-parameter space by training 20 models 
+parameter space by training a group of models 
 concurrently. The jobs will now be deployed and run in the background.
 
 Let's take a look at how they're doing.
