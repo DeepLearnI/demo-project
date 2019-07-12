@@ -97,7 +97,7 @@ import foundations
 import numpy as np
 
 # Constant for the number of models to be submitted 
-NUM_JOBS = 20 
+NUM_JOBS = 100
 
 # Get params returns randomly generated architecture specifications 
 # and hyperparameters in the form of a dictionary
@@ -111,7 +111,6 @@ def generate_params():
         "epochs": np.random.randint(5, 21),
         "seq_length": 100,
         "temperature": np.random.choice([.2, .3, .4]),
-        "num_characters_to_generate": 200,
         "dataset_url": "https://storage.googleapis.com/download.tensorflow.org/data/shakespeare.txt"
     }
     return params

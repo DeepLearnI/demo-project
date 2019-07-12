@@ -1,7 +1,5 @@
 from utils import load_preprocessors
 from model import Model
-import foundations
-
 
 char2idx, idx2char, vocab = load_preprocessors()
 
