@@ -280,8 +280,7 @@ specified by the `foundations_package_manifest.yaml` file.
 
 Click [here](WEBAPP_URL) to go to a demo webapp that makes a REST call
 to the model being served.
-For the Model Name, use the IP address 
-given in the Slack message. Now try outputting generated text
+For the Model Name, use MODEL_IP_ADDRESS. Now try outputting generated text
 from your served model!
 
 ### Next steps
