@@ -1,0 +1,4 @@
+entrypoints:
+  predict:
+    module: predict
+    function: generate_prediction
