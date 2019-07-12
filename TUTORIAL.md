@@ -224,7 +224,7 @@ $ python experiment_management/submit_jobs.py
 That's it! We're now using the full capacity 
 of available compute resources to explore our architecture and 
 parameter space by training 20 models 
-concurrently.
+concurrently. The jobs will now be deployed and run in the background.
 
 Let's take a look at how they're doing.
 
@@ -255,9 +255,6 @@ over a few examples
 to see how our initial models are doing.
 
 ---
----
----
-
 
 
 ## Serving
