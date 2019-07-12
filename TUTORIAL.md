@@ -210,7 +210,7 @@ Type the following command
 $ python experiment_management/submit_jobs.py
 ```
 
-That's it! We're now using the full capacity 
+That's it! Foundations is now using the full capacity 
 of available compute resources to explore our architecture and 
 parameter space by training 20 models 
 concurrently. The jobs will now be deployed and run in the background.
@@ -239,8 +239,9 @@ Each job will show up in the dashboard upon submission, along with an icon indic
 |       red      | Job exited with an error |
 
 
-Some jobs will already be completed. We added a sample
-of generated output as a metric — hover 
+Some jobs will already be completed. Remember that we added a 
+sample
+of generated output as a metric above: hover 
 over a few examples in the `sample output` column
 to see how our models are doing.
 
@@ -249,7 +250,8 @@ to see how our models are doing.
 
 ## Serving
 
-Foundations provides a standard format to seamlessly package machine learning models for production.
+Foundations provides a standard format to seamlessly package machine 
+learning models for production.
 
 We've included a configuration file `foundations_package_manifest.yaml` 
 which tells Foundations to serve `generate_prediction(...)` from `predict.py`
@@ -281,14 +283,17 @@ specified by the `foundations_package_manifest.yaml` file.
 
 Click [here](WEBAPP_URL) to go to a demo webapp that makes a REST call
 to the model being served.
-For the Model Name, use MODEL_IP_ADDRESS. Now try outputting generated text
+For the Model Name field, use MODEL_IP_ADDRESS. Now click "Generate" to 
+output generated text
 from your served model!
 
-### Next steps
+## Next steps
 
 We want to hear your feedback about Foundations! 
 
-* Fill out this 5-minute [feedback survey](link to Google form)
+* Fill out this 5-minute [feedback survey](FEEDBACK_URL)
 * Tell us what you thought of Foundations
 [via email](mailto:foundations@dessa.com)
-* Tweet us [@Dessa](https://twitter.com/dessa) with your best model-generated text using [#FoundationsML](https://twitter.com/search?q=%23FoundationsML)
+* Tweet us [@Dessa](https://twitter.com/dessa) with your 
+best model-generated text using 
+[#FoundationsML](https://twitter.com/search?q=%23FoundationsML)
