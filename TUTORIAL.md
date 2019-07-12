@@ -123,7 +123,7 @@ for _ in range(NUM_JOBS):
         env="scheduler",
         job_directory="experiments/text_generation_simple",
         entrypoint="main.py",
-        project_name="a project name",
+        project_name="text_generation_simple",
         params=generate_params(),
     )
 ```
@@ -196,17 +196,6 @@ params = foundations.load_parameters()
 ```
 
 
-Now we need a configuration file to standardize the model entrypoint for serving.
-
-Right-click on the `text_generation_simple` folder and create a new file called 
-`foundations_package_manifest.yaml` and paste the following text into it:
-
-```yaml
-entrypoints:
-    predict:
-        module: predict
-        function: generate_prediction
-```
 
 
 ### Launch parameter search
@@ -262,6 +251,10 @@ to see how our models are doing.
 
 Foundations provides a standard format to seamlessly package machine learning models for production.
 
+We've included a configuration file `foundations_package_manifest.yaml` 
+which tells Foundations to serve `generate_prediction(...)` from `predict.py`
+
+
 We will use the `predict.py` function and package `yaml` created earlier to serve the model.
 
 
@@ -286,9 +279,9 @@ specified by the `foundations_package_manifest.yaml` file.
 ### Set up pre-baked web app 
 
 
-Go to the provided WebApp URL. 
-For the Model Name, use the IP address 
-given in the Slack message. Now try outputting generated text
+Click [here](WEBAPP_URL) to go to a demo webapp that makes a REST call
+to the model being served.
+For the Model Name, use MODEL_IP_ADDRESS. Now try outputting generated text
 from your served model!
 
 ### Next steps
