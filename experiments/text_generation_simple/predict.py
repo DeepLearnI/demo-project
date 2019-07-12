@@ -6,7 +6,18 @@ import time
 
 char2idx, idx2char, vocab = load_preprocessors()
 
-params = foundations.load_parameters()
+params = {
+        "rnn_layers": 3,
+        "rnn_units": 512,
+        "batch_size": 64,
+        "learning_rate": 0.001,
+        "embedding_dim": 256,
+        "epochs": 3,
+        "seq_length": 100,
+        "temperature": .2,
+        "num_characters_to_generate": 200,
+        "dataset_url": "https://storage.googleapis.com/download.tensorflow.org/data/shakespeare.txt"
+    }
 
 model = Model(vocab,
               embedding_dim=params['embedding_dim'],
