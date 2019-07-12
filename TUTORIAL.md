@@ -63,7 +63,7 @@ Any code can be submitted in this way without modifications.
 
 Now let's scale up our experimentation with Foundations.
 
-## Architecture and parameter search
+## Architecture and hyperparameter search
 
 To the right of this pane, you will see `main.py`. This code was 
 quickly assembled by one of our machine learning engineers without using 
@@ -74,7 +74,7 @@ some Shakespearean text, and the resulting model
 will be able to synthesize new text that sounds 
 (ostensibly) like Shakespeare. 
  
-We're going to optimize the model performance using an architecture and parameter
+We're going to optimize the model performance using an architecture and hyperparameter
  search. 
 
 
@@ -240,19 +240,20 @@ submitted.
 
 Click [here](DASHBOARD_URL) to open the dashboard.
 
+Each job will show up in the dashboard upon submission, along with an icon indicating the run status.
 
 | Icon           | Status                   |
 |----------------|--------------------------|
-|      green     | Job complete             |
-| green flashing | Currently running        |
+|    checkmark   | Job completed                         |
+|      green     | Currently running        |
 |     yellow     | Queued                   |
 |       red      | Job exited with an error |
 
 
 Some jobs will already be completed. We added a sample
 of generated output as a metric — hover 
-over a few examples 
-to see how our initial models are doing.
+over a few examples in the `sample output` column
+to see how our models are doing.
 
 ---
 
@@ -296,5 +297,5 @@ We want to hear your feedback about Foundations!
 
 * Fill out this 5-minute [feedback survey](link to Google form)
 * Tell us what you thought of Foundations
-[via email](mailto:feedback@dessa.com)
+[via email](mailto:foundations@dessa.com)
 * Tweet us [@Dessa](https://twitter.com/dessa) with your best model-generated text using [#FoundationsML](https://twitter.com/search?q=%23FoundationsML)
