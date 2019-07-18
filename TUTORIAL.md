@@ -227,15 +227,15 @@ parameters and performance metrics of all the jobs we
 submitted. 
 
 
-Click [here](DASHBOARD_URL) to open the dashboard.
+Click [here](DASHBOARD_URL) to open the dashboard. Each job will show up in the dashboard upon submission, along with an icon indicating the run status. Refresh the page in order to see updated statuses and metrics.
 
 Each job will show up in the dashboard upon submission, along with an icon indicating the run status.
 
 | Icon           | Status                   |
 |----------------|--------------------------|
-|    checkmark   | Job completed                         |
-|      green     | Currently running        |
-|     yellow     | Queued                   |
+|      green     | Job completed            |
+| green flashing | Currently running        |
+|      yellow    | Queued                   |
 |       red      | Job exited with an error |
 
 
