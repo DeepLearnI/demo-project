@@ -9,7 +9,11 @@
 
 *Estimated time: 20 minutes*
 
+
+
 Welcome to the Foundations trial environment! 
+
+[Foundations Dashboard](DASHBOARD_URL) (opens in a new tab)
 
 In this tutorial we'll go through the process of optimizing and 
 serving a simple text generator
@@ -23,6 +27,7 @@ a fully managed Foundations setup, including:
 * Foundations, TensorFlow, and the Python scientific stack 
 (NumPy, pandas, etc.) pre-installed 
 * An in-browser IDE 
+
 
 
 Foundations is infrastructure-agnostic 
