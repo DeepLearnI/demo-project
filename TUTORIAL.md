@@ -148,7 +148,7 @@ In `main.py` we have lines which print
 useful information about our model. It's easy to get 
 Foundations to log them. 
 
-Around line 30, there is the following code:
+Around line 30, we have the following code:
 
 
 ```python
@@ -201,7 +201,7 @@ params = foundations.load_parameters()
 ### Launch parameter search
 
 
-At the bottom of this window you'll see a terminal. 
+At the bottom of this window there's a terminal. 
 Type the following command
  to launch the script we just wrote:
  
@@ -213,9 +213,15 @@ $ python experiment_management/submit_jobs.py
 That's it! Foundations is now using the full capacity 
 of available compute resources to explore our architecture and 
 parameter space by training a group of models 
-concurrently. The jobs will now be deployed and run in the background.
+concurrently. To run the jobs, the scheduler puts them in a queue. It
+then will automatically spin up GPU machines in the cluster 
+as needed up to the configured limit, and run jobs until the queue is 
+empty. When a worker machine is not being used, the scheduler will automatically
+spin it down after a short timeout window.  
+In this way it maximizes available resources while 
+minimizing the amount of time instances are left idle.
 
-Let's take a look at how they're doing.
+Let's take a look at how the submitted jobs are doing.
 
 
 ## Dashboard
