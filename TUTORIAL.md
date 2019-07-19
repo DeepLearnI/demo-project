@@ -289,9 +289,8 @@ specified by the `foundations_package_manifest.yaml` file.
 
 Click [here](WEBAPP_URL) to go to a demo webapp that makes a REST call
 to the model being served.
-For the Model Name field, use MODEL_IP_ADDRESS. Now click "Generate" to 
-output generated text
-from your served model!
+
+For the Model Name field, use the model ID (model-XXXX) returned from the "foundations serve" command. Now click "Generate" to output generated text from your served model!
 
 ## Next steps
 
