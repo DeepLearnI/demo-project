@@ -299,7 +299,11 @@ For the Model Name field, use the model ID (model-XXXX) returned from the "found
 
 ## Next steps
 
-We want to hear your what you think about Foundations! 
+What are the next steps? Well...anything! Try using your own data and 
+writing (or copying) your own model
+code. Experiment further in any way you like!
+
+After that, we would like to hear your what you think about Foundations! 
 
 * Fill out this [feedback survey](https://docs.google.com/forms/d/1Zs4vZViKgdsa6_0KwgUNIA5MgVAcN77RrX8YN4kxqfo)
 * Tell us what you thought of Foundations
@@ -307,3 +311,4 @@ We want to hear your what you think about Foundations!
 * Tweet us [@Dessa](https://twitter.com/dessa) with your 
 best model-generated text using 
 [#FoundationsML](https://twitter.com/search?q=%23FoundationsML)
+
