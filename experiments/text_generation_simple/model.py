@@ -4,6 +4,7 @@ Each function here can be considered as a step (stage) towards building a model.
 We create a simple function that adds 10 to a number that will be used as a stage in our driver file.
 """
 
+import foundations
 import tensorflow as tf
 import os
 import time
