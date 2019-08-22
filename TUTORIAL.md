@@ -4,241 +4,103 @@
 <br>
 <hr>
 
-
-# Welcome to Foundations
+# Welcome to Foundations Atlas
 
 *Estimated time: 20 minutes*
 
+Welcome to the Foundations Atlas trial environment!
 
+[Foundations Atlas Dashboard](DASHBOARD_URL) (opens in a new tab)
 
-Welcome to the Foundations trial environment! 
+In this tutorial we'll go through the process of optimizing and
+serving a fraud detection model using Atlas.
 
-[Foundations Dashboard](DASHBOARD_URL) (opens in a new tab)
+This trial environment provides you with
+a fully managed Foundations Atlas setup, including:
 
-In this tutorial we'll go through the process of optimizing and 
-serving a simple text generator
-model using Foundations.
+* 10 GPUs
+* Foundations, TensorFlow, and the Python scientific stack
+(NumPy, pandas, etc.) pre-installed
+* An in-browser IDE
 
-This trial environment provides you with 
-a fully managed Foundations setup, including:
-
-
-* 10 GPUs 
-* Foundations, TensorFlow, and the Python scientific stack 
-(NumPy, pandas, etc.) pre-installed 
-* An in-browser IDE 
-
-
-
-Foundations is infrastructure-agnostic 
-and can be set up on-premise 
-or on the cloud. It can be used with any development environment.
+Foundations Atlas is infrastructure-agnostic and can be set up 
+on-premise
+or on the cloud. You can submit foundations jobs from any development 
+environment; the online IDE you're 
+using right now is just an example and Atlas is easy to use from
+whatever tools you prefer!
 
 <img src="https://dessa.com/wp-content/uploads/2019/07/f9s_workflow.png">
 
-In this trial we will start by taking some basic model code and using it 
-to explore some of Foundations' key features.
+&nbsp;
 
+The tutorial will demonstrate the following key features of Foundations 
+Atlas:
 
-This is what we'll achieve today:
+1. We will submit a job using some simple 
+code that was not written with Atlas
+in mind at all.
 
-
-1. With minimal effort, we will optimize our model with an 
+1. With minimal modification and effort, we will optimize our model with an
 architecture and hyperparameter
 search on a cluster of machines with GPUs on Google Cloud Platform
 
 1. We will track and share metrics to assess model performance
 
-1. We will see how Foundations automatically tracks the parameters and 
+1. We will see how Foundations Atlas automatically tracks the parameters and
 results of these experiments in a dashboard, enabling full reproducibility.
 
-1. Finally, we'll select the best model and serve it to a demo web app.  
+## Code Overview
+
+The code in `experiments/fraud_demo` is an example of a simple
+recurrent model
+we will train to 
+identify fraudulent credit card transactions. 
+
+The high level directory structure:
+```
+    experiments/
+        fraud_demo/
+        text_generation_simple/
+        image_segmentation/
+    experiment_management/
+    requirements.txt
+```
+
+We've provided three experiments. This tutorial will walk you through 
+turning the first one into a Foundations Atlas project.
+
+The file driver.py is the driver file which runs the pipeline with 
+any combination of parameters, trains the model and 
+performs inference.
 
 ## Hello, world!
 
-Let's submit a job with Foundations. Run the following command in the terminal:
+Let's submit a job with Foundations Atlas. Run the following command in the terminal:
 
 ```bash
-$ foundations deploy --env scheduler --job-directory experiments/text_generation_simple
+$ foundations deploy --env scheduler --entrypoint code/driver.py
 ```
 
-Congratulations! The job is running and the model is training remotely on GPUs. 
+Congratulations! A job is now running and the model is training remotely on GPUs.
 
-Any code can be submitted in this way without modifications. 
+Any code can be deployed in this way without modifications.
 
-Now let's scale up our experimentation with Foundations.
+## Foundations Atlas Dashboard
 
-## Architecture and hyperparameter search
+Foundations Atlas provides a dashboard that allows teams to monitor
+and manage
+multiple projects across a cluster. We can take a look at the
+parameters and performance metrics of all the jobs we
+submitted.
 
-To the right of this pane, you will see `main.py`. This code was 
-quickly assembled by one of our machine learning engineers without using 
-Foundations. 
-
-The model is a [GRU](https://en.wikipedia.org/wiki/Gated_recurrent_unit) (gated recurrent unit) language generator. We will train it on 
-some Shakespearean text, and the resulting model 
-will be able to synthesize new text that sounds 
-(ostensibly) like Shakespeare. 
- 
-We're going to optimize the model performance using an architecture and hyperparameter
- search. 
-
-
-### Create a job deployment script
-
- Without Foundations, running a search over many 
- architectures and sets of hyperparameters
- is messy and difficult to manage. Foundations makes this
-  straightforward! We're going to 
- write a simple script to immediately kick off 
- a set of jobs of a random search on our cluster. 
-
-In the editor, right click on the `experiment_management/` folder 
-and create a 
-new file called `submit_jobs.py`. Add in the 
-following code:
-
+The dashboard can be accessed by entering the following url on the internet browser
 ```python
-import foundations
-import numpy as np
-
-# Constant for the number of models to be submitted 
-NUM_JOBS = 100
-
-# Get params returns randomly generated architecture specifications 
-# and hyperparameters in the form of a dictionary
-def generate_params():
-    params = {
-        "rnn_layers": np.random.randint(1, 4),
-        "rnn_units": int(np.random.choice([128, 256, 512])),
-        "batch_size": int(np.random.choice([32, 64, 128, 256])),
-        "learning_rate": np.random.choice([0.001, 0.01, 0.005]),
-        "embedding_dim": np.random.randint(128, 257),
-        "epochs": np.random.randint(5, 21),
-        "seq_length": 100,
-        "temperature": np.random.choice([.2, .3, .4]),
-        "dataset_url": "https://storage.googleapis.com/download.tensorflow.org/data/shakespeare.txt"
-    }
-    return params
-    
-# A loop that calls the deploy method from the  
-# Foundations SDK which takes in a parameters dictionary
-# and the entrypoint script for our code (main.py)
-for _ in range(NUM_JOBS):
-    foundations.deploy(
-        env="scheduler",
-        job_directory="experiments/text_generation_simple",
-        entrypoint="main.py",
-        project_name="text_generation_simple",
-        params=generate_params(),
-    )
-```
-
-### Load parameters from Foundations
-
-Start by adding an import statement to the top of `main.py`:
-
-```python
-import foundations
-```
-
-Beginning on line 7, the code has a locally defined parameters dictionary.
-Replace that with the following line:
-```python
-params = foundations.load_parameters()
-```
-
-### Track metrics
-
-In `main.py` we have lines which print 
-useful information about our model. It's easy to get 
-Foundations to log them. 
-
-Around line 30, we have the following code:
-
-
-```python
-train_loss = model.test(dataset_train, steps_per_epoch_train)
-print("Final train loss: {}".format(train_loss))
-
-test_loss = model.test(dataset_test, steps_per_epoch_test)
-print("Final test loss: {}".format(test_loss))
-
-# Change the model to test mode
-model.set_test_mode(checkpoint_dir='./training_checkpoints')
-
-# Prompt the model to output text in the desired format
-generated_text = model.generate(start_string=u"ROMEO: ", num_characters_to_generate=25)
-print("Sample generated text: \n{}".format(generated_text))
- ```
-    
-To track any performance metric using Foundations, you can 
-call `log_metric`. Let's add the following lines to the bottom of `main.py`:
- 
- ```python
-foundations.log_metric("train loss", train_loss)
-foundations.log_metric("test loss", test_loss)
-foundations.log_metric("sample output", generated_text)
-```
-
-Foundations can track any number or string in any part of your project code this way.
-
-
-### Prepare model for serving
-
-In order to serve the model later, we'll need to prepare the `predict.py` 
-entrypoint and create a configuration file.
-
-Open `predict.py` and add an import statement to the top:
-
-```python
-import foundations
-```
-
-Also replace the `params` dictionary with
-
-```python
-params = foundations.load_parameters()
+https://<cluster name>.dashboard.dessa.com/
 ```
 
 
-
-
-### Launch parameter search
-
-
-At the bottom of this window there's a terminal. 
-Type the following command
- to launch the script we just wrote:
- 
-
-```bash
-$ python experiment_management/submit_jobs.py
-```
-
-That's it! Foundations is now using the full capacity 
-of available compute resources to explore our architecture and 
-parameter space by training a group of models 
-concurrently. To run the jobs, the scheduler puts them in a queue. It
-then will automatically spin up GPU machines in the cluster 
-as needed up to the configured limit, and run jobs until the queue is 
-empty. When a worker machine is not being used, the scheduler will automatically
-spin it down after a short timeout window.  
-In this way it maximizes available resources while 
-minimizing the amount of time instances are left idle.
-
-Let's take a look at how the submitted jobs are doing.
-
-
-## Dashboard
-
-Foundations provides a dashboard that allows teams to monitor 
-and manage 
-multiple projects across a cluster. We can take a look at the 
-parameters and performance metrics of all the jobs we 
-submitted. 
-
-
-Click [here](DASHBOARD_URL) to open the dashboard. Each job will show up in the dashboard upon submission, along with an icon indicating the run status. Refresh the page in order to see updated statuses and metrics.
+The dashboard shows a comprehensive list of all the projects being run in the team by different people. For each project, it also shows an interactive list of all the ML experiments and performance metrics.
 
 Each job will show up in the dashboard upon submission, along with an icon indicating the run status.
 
@@ -249,23 +111,196 @@ Each job will show up in the dashboard upon submission, along with an icon indic
 |      yellow    | Queued                   |
 |       red      | Job exited with an error |
 
-
-Some jobs will already be completed. Remember that we added a 
-sample
-of generated output as a metric above: hover 
-over a few examples in the `sample output` column
-to see how our models are doing.
-
 ---
+
+
+
+## Architecture and hyperparameter search
+
+Now let's scale up our experimentation with Foundations Atlas.
+
+To the right of this pane, you will see a file called `driver.py`. This file drives the processing of training and validating a model. 
+
+The model is a temporal convolutional network (TCN) defined in `model.py`. It will be trained it on a dataset of credit card transactions.  
+
+We're going to optimize the model performance using an architecture and hyperparameter search.
+
+### Create a job deployment script
+
+ Without Foundations Atlas, running a search over many
+ architectures and hyperparameters
+ is difficult to manage and keep track of. Foundations Atlas makes this
+  straightforward! We're going to
+ write a simple script to kick off a random search of our hyperparameters.
+
+In the editor, right click on the `code/` folder
+and create a
+new file called `submit_jobs.py`. Add in the
+following code:
+
+```python
+import foundations
+import os
+import numpy as np
+import yaml
+
+with open('config/config.yaml') as configfile:
+    all_params = yaml.load(configfile)
+
+
+# Constant for the number of jobs to be submitted
+NUM_JOBS = 1
+
+
+# Generate_params randomly samples hyperparameters to be tested
+def sample_hyperparameters(all_params):
+    '''
+    Randomly sample hyperparameters for tuning.
+    :param all_params: all the parameters coming from init_configuration function
+    :return: all parameters with randomly sampled hyperparameters
+    '''
+    all_params['tcn_units'] = [int(np.random.choice([128, 256, 512]))] * 3
+    all_params['tcn_dropout'] = [float(np.random.choice([0.05, 0.1, 0.2]))] * 3
+    all_params['kernel_sizes'] = [int(np.random.choice([3, 5]))] * 3
+    all_params['dropout'] = [float(np.random.choice([0.05, 0.1, 0.2]))] * 6
+    all_params['batch_size'] = int(np.random.choice([32, 64, 128, 256]))
+    all_params['learning_rate'] = float(np.random.choice([0.001, 0.005, 0.01]))
+
+    return all_params
+
+# A loop that calls the deploy method for different combinations of hyperparameters
+for _ in range(NUM_JOBS):
+    all_params = sample_hyperparameters(all_params)
+
+    with open(os.path.join('config','hyperparams_config.yaml'), 'w') as outfile:
+        yaml.dump(all_params, outfile, default_flow_style=False)
+
+    foundations.deploy(
+        env="scheduler",
+        job_directory=".",
+        entrypoint="code/driver.py",
+        project_name="User - Anti money laundering"
+    )
+```
+
+This code will sample hyperparameters and launch a job with each set of parameters.
+
+### Load parameters from Foundations Atlas
+
+Start by adding an import statement to the top of `driver.py`:
+
+```python
+import foundations
+```
+
+Around line 14, replace the following line
+```python
+all_params = init_configuration(config_file='config/config.yaml')
+```
+with these lines.
+
+```python
+all_params = init_configuration(config_file='config/hyperparams_config.yaml')
+foundations.log_params(get_arguments_as_dict(all_params))
+
+```
+By doing this, a random sample of hyperparams are read from 'hyperparams_config.yaml' (which is generated by submit_job.py for each job). The line foundations.log_params is used to log these params into foundations system so that they can be tracked via GUI.
+
+
+### Track metrics
+Start by adding an import statement to the top of `model.py` since all of the metrics are being calculated in this file:
+
+```python
+import foundations
+```
+
+In `model.py` we have lines which print
+useful information about our model. It's easy to get
+Foundations Atlas to log them.
+
+Around line 328, we have the following code:
+
+```python
+###### Replace these lines ###########################
+print(f'train_loss:  {float(loss)}')
+print(f'validation_loss{float(val_loss)}')
+print(f'validation_capture_rate{float(capture_rate)}')
+######################################################
+
+```
+
+Replace these lines with the following code:
+```python
+foundations.log_metric('train_loss', loss)
+foundations.log_metric('validation_loss', val_loss)
+foundations.log_metric('capture_rate', capture_rate)
+ ```
+
+Foundations Atlas can track any number or string in any part of your project code this way.
+
+### Save artifacts
+
+During model training, various artifacts may be produced which we'd like to save for later inspection. For instance, tensorboard artifacts.
+
+Below the log_metric lines shown above, add the following lines:
+
+ ```python
+foundations.save_artifact(tensorboard_file, key='tensorboard')
+foundations.save_artifact(fig_path, key='average precision recall_{}'.format(step))
+```
+
+This way, our tensorboard artifacts will be directly accessible from the dashboard.
+
+Around line 408 in model.py, add the following line in order to track the inference speed of the trained model in foundations gui
+```python
+foundations.log_metric('avg_inference_time(sec)', np.mean(time_list))
+```
+
+If you want to track how much TensorRT can prune your neural network to perform faster inference, you can add the following lines around line 514 in model.py.
+
+```python
+foundations.log_metric('num_nodes_trained_model', all_nodes_frozen_graph)
+foundations.log_metric('num_nodes_TensorRT_model', all_nodes)
+```
+
+### Launch Hyperparameter Search
+
+At the bottom of this window there's a terminal.
+Type the following command
+ to launch the script we just wrote:
+
+
+```bash
+$ python code/submit_jobs.py
+```
+
+That's it! Foundations Atlas is now using the full capacity
+of available compute resources to explore our architecture and
+parameter space by training a group of models
+concurrently. To run the jobs, the scheduler puts them in a queue. It
+then will automatically spin up GPU machines in the cluster
+as needed up to the configured limit, and run jobs until the queue is
+empty. When a worker machine is not being used, the scheduler will automatically
+spin it down after a short timeout window.  
+In this way it maximizes available resources while
+minimizing the amount of time instances are left idle.
+
+Let's take a look at how the submitted jobs are doing.
+
+
+## Select the best models from dashboard
+
+Foundations Atlas dashboard provides various sorting and filtering operations that allow to quickly select only the acceptabel models. For example, if our acceptance criteria is capture_rate > 80 and inference_speed < 1 millisecond, we can quickly do this dashboard as shown below:
+
 
 
 ## Serving
 
-Foundations provides a standard format to seamlessly package machine 
+Foundations Atlas provides a standard format to seamlessly package machine
 learning models for production.
 
-We've included a configuration file `foundations_package_manifest.yaml` 
-which tells Foundations to serve `generate_prediction(...)` from `predict.py`
+We've included a configuration file `foundations_package_manifest.yaml`
+which tells Foundations Atlas to serve `generate_prediction(...)` from `predict.py`
 
 
 We will use the `predict.py` function and package `yaml` created earlier to serve the model.
@@ -285,30 +320,20 @@ In the terminal, enter
 foundations serve start <JOB_ID>
 ```
 
-Foundations automatically retrieves the bundle associated with the job_id 
-and wraps it in a REST API. Requests can be made to the entrypoints 
-specified by the `foundations_package_manifest.yaml` file.
-
-### Set up pre-baked web app 
-
-
-Click [here](WEBAPP_URL) to go to a demo webapp that makes a REST call
-to the model being served.
-
-For the Model Name field, use the model ID (model-XXXX) returned from the "foundations serve" command. Now click "Generate" to output generated text from your served model!
+Foundations Atlas automatically retrieves the bundle associated with the job_id
+and wraps it in a REST API. Requests can be made to thrile.
 
 ## Next steps
 
-What are the next steps? Well...anything! Try using your own data and 
+What are the next steps? Well...anything! Try using your own data and
 writing (or copying) your own model
 code. Experiment further in any way you like!
 
-After that, we would like to hear your what you think about Foundations! 
+After that, we would like to hear your what you think about Foundations Atlas!
 
 * Fill out this [feedback survey](https://docs.google.com/forms/d/1Zs4vZViKgdsa6_0KwgUNIA5MgVAcN77RrX8YN4kxqfo)
-* Tell us what you thought of Foundations
+* Tell us what you thought of Foundations Atlas
 [via email](mailto:foundations@dessa.com)
-* Tweet us [@Dessa](https://twitter.com/dessa) with your 
-best model-generated text using 
+* Tweet us [@Dessa](https://twitter.com/dessa) with your
+best model-generated text using
 [#FoundationsML](https://twitter.com/search?q=%23FoundationsML)
-
