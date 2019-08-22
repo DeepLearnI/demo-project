@@ -37,9 +37,9 @@ whatever tools you prefer!
 The tutorial will demonstrate the following key features of Foundations 
 Atlas:
 
-1. We will submit a job using some simple 
-code that was not written with Atlas
-in mind at all.
+
+1. We will submit a job of some straightforward (non-Foundations Atlas) 
+demo code
 
 1. With minimal modification and effort, we will optimize our model with an
 architecture and hyperparameter
@@ -50,9 +50,14 @@ search on a cluster of machines with GPUs on Google Cloud Platform
 1. We will see how Foundations Atlas automatically tracks the parameters and
 results of these experiments in a dashboard, enabling full reproducibility.
 
+
+
+
+
+
 ## Code Overview
 
-The code in `experiments/fraud_demo` is an example of a simple
+The code in `experiments/fraud_mini` is an example of a simple
 recurrent model
 we will train to 
 identify fraudulent credit card transactions. 
@@ -60,26 +65,59 @@ identify fraudulent credit card transactions.
 The high level directory structure:
 ```
     experiments/
-        fraud_demo/
+        fraud_mini/
+        image_seg_lottery/
         text_generation_simple/
-        image_segmentation/
     experiment_management/
     requirements.txt
 ```
 
-We've provided three experiments. This tutorial will walk you through 
-turning the first one into a Foundations Atlas project.
+We've provided three experiments. 
 
-The file driver.py is the driver file which runs the pipeline with 
-any combination of parameters, trains the model and 
-performs inference.
+1. `text_generation_simple` is a language model. The code here downloads some 
+Shakespearean text,
+and the zoneout-LSTM model learns to generate "novel" Shakespearean text based on a prompt. 
+
+1. `fraud_mini` uses a toy dataset of credit card transactions, 
+processes them into transactions for use in a sequential model, and trains an LSTM model
+to predict fraudulent transactions. 
+
+
+1. `image_seg_lottery` implements U-net to do image segmentation on satellite image data and 
+implements the Lottery Ticket Hypothesis to simultaneously prune and improve the model. 
+
+
+## Before we begin
+
+Let's take a look at the [Dashboard](DASHBOARD_URL). Click the
+project "Marcus - satellite segmentation w lottery tickets hypothesis".
+
+The dashboard is a multi-user page that can track multiple projects being managed by Atlas.
+We begin with the `image_seg_lottery` project which has been called "marcus - segmentation".
+Click it. As you can see someone else has already run a few jobs. 
+
+Take a look around the dashboard. You will see several completed jobs. The middle column 
+lists **parameters** being tracked by Atlas, and the rightmost column shows various 
+**metrics** the experimenter for that project has chosen to track. 
+
+Try clicking on a job. You'll see we're also tracking **artifacts**, in this case 
+every job is storing an input image, the target, and the model's segmentation prediction.
+We can use artifacts to store almost any kind of object and quickly access them for 
+hundreds of jobs. 
+
 
 ## Hello, world!
 
-Let's submit a job with Foundations Atlas. Run the following command in the terminal:
+In this tutorial we will take code from a different project, `fraud_mini` which has *not* yet been 
+prepared for use with 
+*Foundations Atlas*.
+
+To begin, we don't actually *need* to do anything to the code 
+to just run a job with Foundations Atlas. 
+So let's submit a job! Run the following command in the terminal:
 
 ```bash
-$ foundations deploy --env scheduler --entrypoint code/driver.py
+$ foundations deploy --env scheduler --job-directory experiments/text_generation_simple 
 ```
 
 Congratulations! A job is now running and the model is training remotely on GPUs.
@@ -144,7 +182,7 @@ import os
 import numpy as np
 import yaml
 
-with open('config/config.yaml') as configfile:
+with open('experiments/fraud_mini/config/config.yaml') as configfile:
     all_params = yaml.load(configfile)
 
 
@@ -159,9 +197,8 @@ def sample_hyperparameters(all_params):
     :param all_params: all the parameters coming from init_configuration function
     :return: all parameters with randomly sampled hyperparameters
     '''
-    all_params['tcn_units'] = [int(np.random.choice([128, 256, 512]))] * 3
-    all_params['tcn_dropout'] = [float(np.random.choice([0.05, 0.1, 0.2]))] * 3
-    all_params['kernel_sizes'] = [int(np.random.choice([3, 5]))] * 3
+    all_params['lstm_units'] = [int(np.random.choice([512, 768, 1024]))] * 2
+    all_params['zoneout'] = [float(np.random.choice([0.05, 0.1, 0.2]))] * 2
     all_params['dropout'] = [float(np.random.choice([0.05, 0.1, 0.2]))] * 6
     all_params['batch_size'] = int(np.random.choice([32, 64, 128, 256]))
     all_params['learning_rate'] = float(np.random.choice([0.001, 0.005, 0.01]))
@@ -172,14 +209,14 @@ def sample_hyperparameters(all_params):
 for _ in range(NUM_JOBS):
     all_params = sample_hyperparameters(all_params)
 
-    with open(os.path.join('config','hyperparams_config.yaml'), 'w') as outfile:
+    with open(os.path.join('experiments/fraud_mini/config','hyperparams_config.yaml'), 'w') as outfile:
         yaml.dump(all_params, outfile, default_flow_style=False)
 
     foundations.deploy(
         env="scheduler",
-        job_directory=".",
+        job_directory="experiments/fraud_mini",
         entrypoint="code/driver.py",
-        project_name="User - Anti money laundering"
+        project_name="your name - fraud mini"
     )
 ```
 
@@ -290,7 +327,11 @@ Let's take a look at how the submitted jobs are doing.
 
 ## Select the best models from dashboard
 
-Foundations Atlas dashboard provides various sorting and filtering operations that allow to quickly select only the acceptabel models. For example, if our acceptance criteria is capture_rate > 80 and inference_speed < 1 millisecond, we can quickly do this dashboard as shown below:
+Foundations Atlas dashboard provides various sorting and filtering operations that allow to 
+quickly find the best model
+For example, if our acceptance criteria is 
+capture_rate > 80 and inference_speed < 1 millisecond, 
+we can quickly do this dashboard as shown below:
 
 
 
