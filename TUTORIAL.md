@@ -87,58 +87,15 @@ to predict fraudulent transactions.
 implements the Lottery Ticket Hypothesis to simultaneously prune and improve the model. 
 
 
-## Before we begin
-
-Let's take a look at the [Dashboard](DASHBOARD_URL). Click the
-project "Marcus - satellite segmentation w lottery tickets hypothesis".
-
-The dashboard is a multi-user page that can track multiple projects being managed by Atlas.
-We begin with the `image_seg_lottery` project which has been called "marcus - segmentation".
-Click it. As you can see someone else has already run a few jobs. 
-
-Take a look around the dashboard. You will see several completed jobs. The middle column 
-lists **parameters** being tracked by Atlas, and the rightmost column shows various 
-**metrics** the experimenter for that project has chosen to track. 
-
-Try clicking on a job. You'll see we're also tracking **artifacts**, in this case 
-every job is storing an input image, the target, and the model's segmentation prediction.
-We can use artifacts to store almost any kind of object and quickly access them for 
-hundreds of jobs. 
-
-
-## Hello, world!
-
-In this tutorial we will take code from a different project, `fraud_mini` which has *not* yet been 
-prepared for use with 
-*Foundations Atlas*.
-
-To begin, we don't actually *need* to do anything to the code 
-to just run a job with Foundations Atlas. 
-So let's submit a job! Run the following command in the terminal:
-
-```bash
-$ foundations deploy --env scheduler --job-directory experiments/text_generation_simple 
-```
-
-Congratulations! A job is now running and the model is training remotely on GPUs.
-
-Any code can be deployed in this way without modifications.
-
 ## Foundations Atlas Dashboard
 
-Foundations Atlas provides a dashboard that allows teams to monitor
+
+The [Dashboard](DASHBOARD_URL) provided by Foundations Atlas allows teams to monitor
 and manage
 multiple projects across a cluster. We can take a look at the
 parameters and performance metrics of all the jobs we
-submitted.
-
-The dashboard can be accessed by entering the following url on the internet browser
-```python
-https://<cluster name>.dashboard.dessa.com/
-```
-
-
-The dashboard shows a comprehensive list of all the projects being run in the team by different people. For each project, it also shows an interactive list of all the ML experiments and performance metrics.
+submitted. It shows a comprehensive list of all the projects being run in the team by different people. 
+For each project, it also shows an interactive list of all the ML experiments and performance metrics.
 
 Each job will show up in the dashboard upon submission, along with an icon indicating the run status.
 
@@ -151,15 +108,56 @@ Each job will show up in the dashboard upon submission, along with an icon indic
 
 ---
 
+Let's take a look. The `image_seg_lottery` project is already there, run by someone else who's called it
+called "Marcus - satellite segmentation w lottery tickets hypothesis".
+Click it and let's take a look around. 
+As you can see "Marcus" has already run a few jobs. 
+
+The middle column 
+lists **parameters** being tracked by Atlas, and the rightmost column shows various 
+**metrics** the experimenter for that project has chosen to track. 
+
+Try clicking on one of the completed jobs. You'll see that **artifacts** are also being tracked
+for each job. In this case 
+every job is storing an input image, the target, and the model's segmentation prediction.
+We can use artifacts to store almost any kind of object and quickly access them for 
+hundreds of jobs. 
+
+
+## Hello, world!
+
+
+To begin using *Foundations Atlas*, we don't actually *need* to do anything to the code 
+immediately. Let's quickly demonstrate by submitting 
+a job that's just some
+standard machine learning code, `text_generation_simple`. 
+Run the following command in the terminal:
+
+```bash
+$ foundations deploy --env scheduler --job-directory experiments/text_generation_simple 
+```
+
+Go back to the [Dashboard](DASHBOARD_URL), click on Projects, then `text_generation_simple` 
+to confirm that the job you just submitted is running. 
+
+Congratulations! With almost no effort you're training a model remotely on a GPU.
+
+If you look back in the terminal below, you'll see the live streaming standard output of 
+the job.
+
+
+Pretty much any code can be run in this way without modification.
+
 
 
 ## Architecture and hyperparameter search
 
 Now let's scale up our experimentation with Foundations Atlas.
 
-To the right of this pane, you will see a file called `driver.py`. This file drives the processing of training and validating a model. 
+In the Explorer on the left of this IDE, expand the `experiments` folder, then the
+`fraud_mini` folder, and finally the `code` folder. 
 
-The model is a temporal convolutional network (TCN) defined in `model.py`. It will be trained it on a dataset of credit card transactions.  
+The model is defined in `model.py`. It will be trained it on a dataset of credit card transactions.  
 
 We're going to optimize the model performance using an architecture and hyperparameter search.
 
