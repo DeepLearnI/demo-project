@@ -4,7 +4,8 @@ Unauthorized copying, distribution, reproduction, publication, use of this file,
 Proprietary and confidential – June 2019
 """
 import os
-os.environ['KMP_DUPLICATE_LIB_OK']='True'
+
+os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
 import numpy as np
 from model import Model, save_freeze_tensorflow_model_for_inference, convert_to_tensor_rt, inference_from_tensor_rt_graph
 from preprocessing import preprocess

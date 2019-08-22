@@ -1,13 +1,11 @@
 batch_size: 128
 max_time_steps: 25
 tf_log_level: 1
-name: 'TCN'
-model: 'TCN'
-recurrency_type: 'TCN'
-tcn_units: [512, 512, 512]
-kernel_sizes: [3, 3, 3]
-dilations: [1, 2, 4]
-tcn_dropout: [0.1, 0.1, 0.1]
+name: 'LSTM'
+model: 'LSTM'
+recurrency_type: 'LSTM'
+lstm_units: [1024, 1024]
+zoneout: [0.1, 0.1]
 dense_units: [1024, 1024, 512, 256, 256, 128]
 dropout: [0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
 learning_rate: 0.001
@@ -20,10 +18,10 @@ epsilon: 0.000001
 reg_weight: 0.00001
 clip_gradients: True
 grad_clip_val: 1.
-train_steps: 10
+train_steps: 4000
 restore: True
-checkpoint_interval: 5
-eval_interval: 5
+checkpoint_interval: 1000
+eval_interval: 1000
 summary_interval: 250
 pos_weight: 5
 spatial_dropout: True
