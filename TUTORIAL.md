@@ -149,15 +149,32 @@ the job.
 Pretty much any code can be run in this way without modification.
 
 
-
-## Architecture and hyperparameter search
-
-Now let's scale up our experimentation with Foundations Atlas.
+## Track parameters and metrics
 
 In the Explorer on the left of this IDE, expand the `experiments` folder, then the
 `fraud_mini` folder, and finally the `code` folder. 
 
-The model is defined in `model.py`. It will be trained it on a dataset of credit card transactions.  
+The model is defined in `model.py`, the entry point is called `driver.py`. 
+It will be trained it on a dataset of credit card transactions. Feel free to 
+poke around through the code a bit.
+
+Right click `driver.py` and click "Open to the Side". 
+
+First let's add an import statement after line 6:
+
+```python
+import foundations
+```
+
+Next, we want to log our params. We're already getting our params from a utility that
+parse command line arguments. 
+
+
+
+
+## Architecture and hyperparameter search
+
+Now let's scale up our experimentation with Foundations Atlas.
 
 We're going to optimize the model performance using an architecture and hyperparameter search.
 
@@ -169,9 +186,9 @@ We're going to optimize the model performance using an architecture and hyperpar
   straightforward! We're going to
  write a simple script to kick off a random search of our hyperparameters.
 
-In the editor, right click on the `code/` folder
+In the editor, right click on the `experiment_management/` folder
 and create a
-new file called `submit_jobs.py`. Add in the
+new file called `submit_fraud_jobs.py`. Add in the
 following code:
 
 ```python
