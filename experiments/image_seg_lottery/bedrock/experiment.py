@@ -23,7 +23,7 @@ import tensorflow as tf
 
 from utils import get_logger
 
-#import foundations as f9s
+import foundations as f9s
 
 logger = get_logger('experiments')
 
@@ -82,7 +82,7 @@ def experiment(make_dataset, make_model, train_model, prune_masks, iterations,
         masks = prune_masks(masks, final)
 
         num_weights = int(sum([v.sum() for v in masks.values()]))
-        #f9s.log_metric('num_weights_{}'.format(iteration), num_weights)
+        f9s.log_metric('num_weights_{}'.format(iteration), num_weights)
 
         logger.info('Train the network again after pruning')
         _, final = train_once(iteration, presets=initial, masks=masks)

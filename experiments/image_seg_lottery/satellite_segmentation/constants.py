@@ -24,7 +24,7 @@ from bedrock import paths
 import tensorflow as tf
 import numpy as np
 
-#import foundations as f9s
+import foundations as f9s
 
 ISZ = 160
 N_Cls = 10
@@ -83,7 +83,7 @@ params_dict = {**HYPERPARAMETERS, **PRUNE_PERCENTS,
                'inputs_dataset': inputs_file_name,
                'targets_dataset': targets_file_name}
 
-#f9s.log_params(params_dict)
+f9s.log_params(params_dict)
 
 
 def graph(category, filename):
