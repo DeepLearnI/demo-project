@@ -1,0 +1,5 @@
+tqdm
+zipfile36
+scikit-image
+scikit-learn
+tensorflow-gpu==1.14
