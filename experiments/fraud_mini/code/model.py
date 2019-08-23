@@ -4,6 +4,7 @@ Unauthorized copying, distribution, reproduction, publication, use of this file,
 Proprietary and confidential – June 2019
 """
 
+import foundations
 import os
 import tensorflow as tf
 from tensorflow.python.client import timeline
