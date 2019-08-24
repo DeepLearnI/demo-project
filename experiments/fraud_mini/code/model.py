@@ -4,7 +4,6 @@ Unauthorized copying, distribution, reproduction, publication, use of this file,
 Proprietary and confidential – June 2019
 """
 
-import foundations
 import os
 import tensorflow as tf
 from tensorflow.python.client import timeline
@@ -306,7 +305,6 @@ class Model:
                 
                 if step % self.all_params.summary_interval == 0:
                     print('\nWriting summary at step {}'.format(step))
-                    foundations.log_metric('training_loss', loss, step)
                     summary_writer.add_summary(sess.run(self.stats), step)
                 
                 if step % self.all_params.checkpoint_interval == 0 or step == self.all_params.train_steps:
@@ -348,7 +346,6 @@ class Model:
                     
                     val_loss = sum(val_losses) / len(val_losses)
                     
-                    foundations.log_metric('validation_loss', val_loss, step=step)
 
                     assert len(targets) == len(outputs)
                     capture_rate, fig_path = evaluate_and_plot(outputs, targets, index=np.arange(0, len(targets)),
@@ -356,12 +353,10 @@ class Model:
                                                                weight=self.all_params.capture_weight, out_dir=self.eval_dir, use_tf=False, sess=sess,
                                                                step=step)
                     
-                    foundations.log_metric('validation_capture_rate', capture_rate, step=step)
                     add_eval_stats(summary_writer, step, val_loss, capture_rate)
                     
                     tensorboard_file = os.path.join(self.tensorboard_dir, os.listdir(self.tensorboard_dir)[0])
-                    foundations.save_artifact(tensorboard_file, "tensorboard")
-                    
+
                     ###### Replace these lines ###########################
                     print(f'train_loss:  {float(loss)}')
                     print(f'validation_loss{float(val_loss)}')
