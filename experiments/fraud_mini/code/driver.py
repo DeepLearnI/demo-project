@@ -3,7 +3,6 @@ Copyright (C) DeepLearning Financial Technologies Inc. - All Rights Reserved
 Unauthorized copying, distribution, reproduction, publication, use of this file, via any medium is strictly prohibited.
 Proprietary and confidential – June 2019
 """
-import foundations
 import os
 
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
@@ -13,8 +12,7 @@ from preprocessing import preprocess
 from utils import init_configuration, download_data, get_log_dir, get_arguments_as_dict
 
 # read the parameters from the config file
-all_params = init_configuration(config_file='config/hyperparams_config.yaml')
-foundations.log_params(get_arguments_as_dict(all_params))
+all_params = init_configuration(config_file='config/config.yaml')
 
 # getting log directory to save the model and results
 log_dir = get_log_dir(all_params)

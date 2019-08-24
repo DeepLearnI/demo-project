@@ -38,20 +38,25 @@ The tutorial will demonstrate the following key features of Foundations
 Atlas:
 
 
-1. We will submit a job of some straightforward (non-Foundations Atlas) 
-demo code
+1. Foundations Atlas will quietly help you get the most out of 
+by managing your machine learning jobs and autoscaling resources, 
+helping you easily get the most out of expensive compute resources
+like GPUs, whether on cloud or on prem. 
 
-1. With minimal modification and effort, we will optimize our model with an
+1. You can start using Foundations Atlas with pretty much any
+Python code right away
+
+1. Atlas allows you to easily track whatever important metrics 
+and parameters 
+about any machine learning experiment you run, enabling full
+reproducibility. 
+
+1. With minimal modification and effort, 
+Atlas let's you optimize our model with an
 architecture and hyperparameter
-search on a cluster of machines with GPUs on Google Cloud Platform
-
-1. We will track and share metrics to assess model performance
-
-1. We will see how Foundations Atlas automatically tracks the parameters and
-results of these experiments in a dashboard, enabling full reproducibility.
-
-
-
+search. In this 
+trial we will do this on a cluster of machines with GPUs 
+on Google Cloud Platform
 
 
 
@@ -76,28 +81,36 @@ We've provided three experiments.
 
 1. `text_generation_simple` is a language model. The code here downloads some 
 Shakespearean text,
-and the zoneout-LSTM model learns to generate "novel" Shakespearean text based on a prompt. 
+and the zoneout-LSTM model learns to generate "novel" Shakespearean 
+text based on a prompt. 
 
 1. `fraud_mini` uses a toy dataset of credit card transactions, 
-processes them into transactions for use in a sequential model, and trains an LSTM model
+processes them into transactions for use in a sequential model, and 
+trains an LSTM model
 to predict fraudulent transactions. 
 
 
-1. `image_seg_lottery` implements U-net to do image segmentation on satellite image data and 
-implements the Lottery Ticket Hypothesis to simultaneously prune and improve the model. 
+1. `image_seg_lottery` implements U-net to do image segmentation 
+on satellite image data and 
+implements the Lottery Ticket Hypothesis to simultaneously prune 
+and improve the model. 
 
 
 ## Foundations Atlas Dashboard
 
 
-The [Dashboard](DASHBOARD_URL) provided by Foundations Atlas allows teams to monitor
+The [Dashboard](DASHBOARD_URL) provided by Foundations Atlas 
+allows teams to monitor
 and manage
 multiple projects across a cluster. We can take a look at the
 parameters and performance metrics of all the jobs we
-submitted. It shows a comprehensive list of all the projects being run in the team by different people. 
-For each project, it also shows an interactive list of all the ML experiments and performance metrics.
+submitted. It shows a comprehensive list of all the projects being 
+run in the team by different people. 
+For each project, it also shows an interactive list of all the ML 
+experiments and performance metrics.
 
-Each job will show up in the dashboard upon submission, along with an icon indicating the run status.
+Each job will show up in the dashboard upon submission, along with an 
+icon indicating the run status.
 
 | Icon           | Status                   |
 |----------------|--------------------------|
@@ -108,13 +121,15 @@ Each job will show up in the dashboard upon submission, along with an icon indic
 
 ---
 
-Let's take a look. The `image_seg_lottery` project is already there, run by someone else who's called it
+Let's take a look. The `image_seg_lottery` project is already there, 
+run by someone else who's called it
 called "Marcus - satellite segmentation w lottery tickets hypothesis".
 Click it and let's take a look around. 
 As you can see "Marcus" has already run a few jobs. 
 
 The middle column 
-lists **parameters** being tracked by Atlas, and the rightmost column shows various 
+lists **parameters** being tracked by Atlas, and the rightmost column 
+shows various 
 **metrics** the experimenter for that project has chosen to track. 
 
 Try clicking on one of the completed jobs. You'll see that **artifacts** are also being tracked
@@ -142,9 +157,8 @@ to confirm that the job you just submitted is running.
 
 Congratulations! With almost no effort you're training a model remotely on a GPU.
 
-If you look back in the terminal below, you'll see the live streaming standard output of 
-the job.
-
+If you look back in the terminal below, you'll see the live streaming standard 
+output of the job.
 
 Pretty much any code can be run in this way without modification.
 
@@ -153,6 +167,26 @@ Pretty much any code can be run in this way without modification.
 
 In the Explorer on the left of this IDE, expand the `experiments` folder, then the
 `fraud_mini` folder, and finally the `code` folder. 
+
+The structure of this project is as follows:
+
+```
+    code
+        capture_rate.py
+        causal_conv.py
+        driver.py
+        masked_loss.py
+        model.py
+        preprocessing.py
+        projection.py
+        utils.py
+        vanilla_tcn.py
+    config
+        config.yaml
+    data
+    requirements.txt
+
+```
 
 The model is defined in `model.py`, the entry point is called `driver.py`. 
 It will be trained it on a dataset of credit card transactions. Feel free to 
@@ -166,17 +200,71 @@ First let's add an import statement after line 6:
 import foundations
 ```
 
-Next, we want to log our params. We're already getting our params from a utility that
-parse command line arguments. 
+Next, we want to log our params. The code we're using
+happens to be set up to get our params from a utility that
+parse command line arguments. At line 15, you'll find 
+
+```python
+
+# read the parameters from the config file
+all_params = init_configuration(config_file='config/config.yaml')
+```
+
+Let's simply add the following line immediately below
+
+```python
+foundations.log_params(vars(args))
+```
+
+`log_params(...)` can take a single parameter or a 
+dictionary of parameters as we've done above. 
 
 
+In `model.py`, letlet's add the import statement 
+`import foundations` again.
 
+Next we have lines which print
+useful information about our model. It's easy to get
+Foundations Atlas to log them.
+
+Around line 367, we have the following code:
+
+```python
+###### Replace these lines ###########################
+print(f'train_loss:  {float(loss)}')
+print(f'validation_loss{float(val_loss)}')
+print(f'validation_capture_rate{float(capture_rate)}')
+######################################################
+
+```
+
+Replace these lines with the following code:
+```python
+foundations.log_metric('train_loss', loss)
+foundations.log_metric('validation_loss', val_loss)
+foundations.log_metric('capture_rate', capture_rate)
+ ```
+
+Foundations Atlas can track any number or string in any part of your project code this way.
+
+Let's see how all of these tracked parameters and metrics look! 
+Submit a job with 
+
+```bash
+$ foundations deploy --env scheduler --job-directory experiments/fraud_mini --entry-point code/driver.py
+```
+
+and go back to the [Dashboard](DASHBOARD_URL), click on Projects, 
+click "fraud_mini", and take a look at how the parameters are already tracked.
+Metrics are displayed as soon as they're available, so metrics will start showing up
+while an experiment is still running.
 
 ## Architecture and hyperparameter search
 
 Now let's scale up our experimentation with Foundations Atlas.
 
-We're going to optimize the model performance using an architecture and hyperparameter search.
+We're going to optimize the model performance using an architecture and 
+hyperparameter search.
 
 ### Create a job deployment script
 
@@ -202,7 +290,7 @@ with open('experiments/fraud_mini/config/config.yaml') as configfile:
 
 
 # Constant for the number of jobs to be submitted
-NUM_JOBS = 1
+NUM_JOBS = 40
 
 
 # Generate_params randomly samples hyperparameters to be tested
@@ -224,9 +312,13 @@ def sample_hyperparameters(all_params):
 for _ in range(NUM_JOBS):
     all_params = sample_hyperparameters(all_params)
 
+    # The code that was written without Atlas in mind 
+    # happens to reads configs from a yaml file,
+    # so we'll just dump our hyperparams into a yaml.
     with open(os.path.join('experiments/fraud_mini/config','hyperparams_config.yaml'), 'w') as outfile:
         yaml.dump(all_params, outfile, default_flow_style=False)
 
+    # Rename the project using the project_name parameter below!
     foundations.deploy(
         env="scheduler",
         job_directory="experiments/fraud_mini",
@@ -237,100 +329,45 @@ for _ in range(NUM_JOBS):
 
 This code will sample hyperparameters and launch a job with each set of parameters.
 
-### Load parameters from Foundations Atlas
-
-Start by adding an import statement to the top of `driver.py`:
-
-```python
-import foundations
-```
-
-Around line 14, replace the following line
-```python
-all_params = init_configuration(config_file='config/config.yaml')
-```
-with these lines.
+Now go back to `driver.py` and modify line 16 to access the
+`hyperparams_config.yaml` we're writing with each job.
 
 ```python
 all_params = init_configuration(config_file='config/hyperparams_config.yaml')
-foundations.log_params(get_arguments_as_dict(all_params))
-
-```
-By doing this, a random sample of hyperparams are read from 'hyperparams_config.yaml' (which is generated by submit_job.py for each job). The line foundations.log_params is used to log these params into foundations system so that they can be tracked via GUI.
-
-
-
-In `model.py` we have lines which print
-del
-useful information about our model. It's easy to get
-Foundations Atlas to log them.
-
-Around line 328, we have the following code:
-
-```python
-###### Replace these lines ###########################
-print(f'train_loss:  {float(loss)}')
-print(f'validation_loss{float(val_loss)}')
-print(f'validation_capture_rate{float(capture_rate)}')
-######################################################
-
 ```
 
-Replace these lines with the following code:
-```python
-foundations.log_metric('train_loss', loss)
-foundations.log_metric('validation_loss', val_loss)
-foundations.log_metric('capture_rate', capture_rate)
- ```
+Each job that gets submitted will have a new set of 
+hyperparameters, sampled as we defined them, and will have a unique
+`hyperparams_config.yaml` to load. 
 
-Foundations Atlas can track any number or string in any part of your project code this way.
-
-### Save artifacts
-
-During model training, various artifacts may be produced which we'd like to save for later inspection. For instance, tensorboard artifacts.
-
-Below the log_metric lines shown above, add the following lines:
-
- ```python
-foundations.save_artifact(tensorboard_file, key='tensorboard')
-foundations.save_artifact(fig_path, key='average precision recall_{}'.format(step))
-```
-
-This way, our tensorboard artifacts will be directly accessible from the dashboard.
-
-Around line 408 in model.py, add the following line in order to track the inference speed of the trained model in foundations gui
-```python
-foundations.log_metric('avg_inference_time(sec)', np.mean(time_list))
-```
-
-If you want to track how much TensorRT can prune your neural network to perform faster inference, you can add the following lines around line 514 in model.py.
-
-```python
-foundations.log_metric('num_nodes_trained_model', all_nodes_frozen_graph)
-foundations.log_metric('num_nodes_TensorRT_model', all_nodes)
-```
-
-### Launch Hyperparameter Search
-
-At the bottom of this window there's a terminal.
-Type the following command
- to launch the script we just wrote:
-
+Now, to launch the script we just wrote, just run the script from the
+terminal below:
 
 ```bash
-$ python code/submit_jobs.py
+$ python code/submit_fraud_jobs.py
 ```
 
-That's it! Foundations Atlas is now using the full capacity
-of available compute resources to explore our architecture and
-parameter space by training a group of models
-concurrently. To run the jobs, the scheduler puts them in a queue. It
-then will automatically spin up GPU machines in the cluster
-as needed up to the configured limit, and run jobs until the queue is
-empty. When a worker machine is not being used, the scheduler will automatically
-spin it down after a short timeout window.  
-In this way it maximizes available resources while
-minimizing the amount of time instances are left idle.
+
+
+
+That's it! Foundations Atlas is now using the full capacity of available compute 
+resources to explore our architecture and parameter space 
+by training a group of models concurrently. 
+
+To run the jobs, the scheduler puts them in a queue. 
+It then will automatically spin up GPU machines in the cluster as needed up to the configured limit, and run jobs until the queue is empty. When a worker machine is not being used, the scheduler will automatically spin it down after a short timeout window.
+In this way it maximizes available resources while minimizing the amount of time instances are left idle.
+
+We did all this by applying only minimal modifications 
+to pre-existing model 
+code that handled parameter configurations in it's own way.
+in its own way.
+
+
+Go back to the [Dashboard](DASHBOARD_URL), go to the project
+you named above, and watch the search find the best fraud model!
+
+
 
 
 

@@ -11,9 +11,6 @@ import os
 from datetime import datetime
 import urllib.request
 
-def get_arguments_as_dict(args):
-    return {k:str(v) for k,v in vars(args).items()}
-
 
 def time_string():
     return datetime.now().strftime('%Y-%m-%d %H:%M')
